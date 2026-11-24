@@ -1,0 +1,3548 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ARCH-Terminal Pro — Vanguard Custom Edition (성유진)</title>
+<style>
+  :root {
+    --bg-outer: #07080a;
+    --titanium-1: #1b1e23;
+    --titanium-2: #0f1114;
+    --titanium-border: rgba(255, 255, 255, 0.14);
+    --screen-bg: #0c0d10;
+    --surface-1: #15171c;
+    --surface-2: #1d2027;
+    --surface-3: #262a33;
+    --glass: rgba(18, 20, 26, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.11);
+    --text-1: #f4f5f7;
+    --text-2: #a9b0bc;
+    --text-3: #6c7380;
+    --pink: #f497b6;
+    --pink-soft: rgba(244, 151, 182, 0.16);
+    --pink-strong: #ff6b9d;
+    --crimson: #e03c4e;
+    --crimson-soft: rgba(224, 60, 78, 0.16);
+    --emerald: #34d399;
+    --cyan: #38bdf8;
+    --gold: #eab308;
+    --radius-phone: 44px;
+    --radius-screen: 36px;
+    --radius-card: 16px;
+    --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", "Noto Sans KR", sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 20%, #171a21 0%, #090a0d 55%, #040507 100%);
+    color: var(--text-1);
+    font-family: var(--font);
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+  }
+
+  /* Decorative ambient glow */
+  .ambient-glow {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(circle at 20% 15%, rgba(244, 151, 182, 0.06), transparent 40%),
+      radial-gradient(circle at 80% 85%, rgba(224, 60, 78, 0.06), transparent 45%);
+  }
+
+  /* Titanium Device Frame */
+  .device-wrapper {
+    position: relative;
+    z-index: 1;
+    width: min(410px, 100%);
+    height: min(844px, calc(100vh - 28px));
+    max-height: 860px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .phone-frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius-phone);
+    background: linear-gradient(145deg, #2b2f37 0%, #14161a 35%, #0d0e11 75%, #23262d 100%);
+    padding: 9px;
+    box-shadow:
+      0 30px 70px rgba(0, 0, 0, 0.85),
+      0 0 0 1px rgba(255, 255, 255, 0.12),
+      inset 0 1px 1px rgba(255, 255, 255, 0.22);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Hardware Side Power Button */
+  .hw-power-btn {
+    position: absolute;
+    right: -6px;
+    top: 170px;
+    width: 6px;
+    height: 68px;
+    border-radius: 0 4px 4px 0;
+    background: linear-gradient(180deg, #3a3f4a, #1d2026);
+    border: none;
+    cursor: pointer;
+    touch-action: manipulation;
+    z-index: 20;
+    transition: transform 0.12s ease, background 0.12s ease;
+  }
+  .hw-power-btn:active {
+    transform: translateX(-2px);
+    background: #525968;
+  }
+
+  .phone-screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius-screen);
+    background: var(--screen-bg);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  }
+
+  /* Sapphire Glass Sheen (non-interactive) */
+  .sapphire-sheen {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 95;
+    background: linear-gradient(125deg, rgba(255, 255, 255, 0.045) 0%, transparent 32%, transparent 72%, rgba(255, 255, 255, 0.02) 100%);
+    border-radius: var(--radius-screen);
+  }
+
+  /* Status Bar */
+  .status-bar {
+    position: relative;
+    z-index: 80;
+    height: 40px;
+    padding: 8px 18px 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--text-1);
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0) 100%);
+    flex-shrink: 0;
+  }
+
+  .status-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .status-notch {
+    position: absolute;
+    left: 50%;
+    top: 8px;
+    transform: translateX(-50%);
+    width: 84px;
+    height: 22px;
+    border-radius: 12px;
+    background: #050607;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    pointer-events: none;
+  }
+
+  .notch-lens {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #2b4c7e, #090c12 70%);
+    box-shadow: 0 0 3px rgba(56, 189, 248, 0.35);
+  }
+
+  .notch-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--emerald);
+    opacity: 0.85;
+  }
+
+  .status-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .status-storage {
+    font-size: 10px;
+    color: var(--text-2);
+    background: rgba(255, 255, 255, 0.08);
+    padding: 1px 5px;
+    border-radius: 5px;
+  }
+
+  .battery-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10.5px;
+  }
+
+  .battery-icon {
+    width: 20px;
+    height: 10px;
+    border: 1.2px solid rgba(255, 255, 255, 0.7);
+    border-radius: 3px;
+    padding: 1px;
+    position: relative;
+    display: inline-flex;
+  }
+  .battery-icon::after {
+    content: "";
+    position: absolute;
+    right: -3px;
+    top: 2px;
+    width: 2px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 0 1px 1px 0;
+  }
+  .battery-fill {
+    width: 90%;
+    height: 100%;
+    background: var(--emerald);
+    border-radius: 1.5px;
+  }
+
+  /* Screen Viewport */
+  .screen-stack {
+    position: relative;
+    flex: 1;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--screen-bg);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(18px) scale(0.985);
+    transition: opacity 0.2s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.2s;
+    z-index: 10;
+    overflow: hidden;
+  }
+
+  .screen.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(0) scale(1);
+    z-index: 25;
+  }
+
+  /* Interactive elements baseline */
+  button, .clickable {
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    font-family: inherit;
+    color: inherit;
+  }
+
+  .tap-scale {
+    transition: transform 0.12s ease, background-color 0.15s ease, opacity 0.15s ease;
+  }
+  .tap-scale:active {
+    transform: scale(0.96);
+    opacity: 0.88;
+  }
+
+  /* Bottom System Navigation Bar */
+  .sys-nav {
+    position: relative;
+    z-index: 80;
+    height: 52px;
+    padding: 0 18px 4px;
+    background: rgba(10, 11, 14, 0.92);
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-shrink: 0;
+  }
+
+  .sys-nav-btn {
+    min-width: 68px;
+    min-height: 44px;
+    border: none;
+    background: transparent;
+    color: var(--text-2);
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 500;
+    transition: background 0.15s, color 0.15s, transform 0.1s;
+  }
+  .sys-nav-btn:hover {
+    color: var(--text-1);
+    background: rgba(255, 255, 255, 0.06);
+  }
+  .sys-nav-btn:active {
+    transform: scale(0.94);
+    background: rgba(255, 255, 255, 0.12);
+  }
+  .sys-nav-btn.home-pill {
+    color: var(--text-1);
+  }
+
+  /* ================= LOCK SCREEN ================= */
+  .lock-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 65% 24%, rgba(255, 241, 214, 0.35), transparent 36%),
+      linear-gradient(180deg, #0b2434 0%, #0d4b5e 34%, #12838c 56%, #74c7c9 72%, #e9decb 85%, #d6c5ad 100%);
+  }
+
+  .lock-bg-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(6, 10, 16, 0.56) 0%, rgba(6, 10, 16, 0.18) 45%, rgba(8, 10, 14, 0.78) 100%);
+  }
+
+  .lock-content {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 26px 22px 24px;
+    text-align: center;
+  }
+
+  .lock-top-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .lock-device-tag {
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.75);
+    background: rgba(0, 0, 0, 0.32);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    padding: 3px 10px;
+    border-radius: 99px;
+  }
+
+  .lock-clock {
+    font-size: 56px;
+    font-weight: 200;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-top: 8px;
+    text-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  }
+
+  .lock-date {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  }
+
+  .lock-photo-caption {
+    margin: auto 0 12px;
+    background: rgba(10, 12, 16, 0.48);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 16px;
+    padding: 12px 14px;
+    text-align: left;
+  }
+
+  .lock-photo-caption .cap-title {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--pink);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .lock-photo-caption .cap-desc {
+    font-size: 11.5px;
+    line-height: 1.48;
+    color: rgba(244, 245, 247, 0.88);
+  }
+
+  .lock-filter-pill {
+    font-size: 11px;
+    color: var(--text-2);
+    background: rgba(12, 14, 18, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 8px 12px;
+    margin-bottom: 14px;
+  }
+
+  .iris-unlock-btn {
+    width: 100%;
+    min-height: 54px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    background: rgba(14, 17, 23, 0.78);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--text-1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+    transition: transform 0.12s, background 0.15s, border-color 0.2s;
+  }
+  .iris-unlock-btn:active {
+    transform: scale(0.97);
+    background: rgba(244, 151, 182, 0.2);
+    border-color: var(--pink);
+  }
+  .iris-ring {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--cyan);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+  }
+  .iris-ring-inner {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--cyan);
+  }
+
+  /* ================= HOME SCREEN ================= */
+  .home-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 52% 48%, rgba(255, 210, 224, 0.34) 0%, rgba(235, 170, 192, 0.16) 28%, rgba(24, 20, 26, 0.92) 72%, #0a0b0e 100%),
+      linear-gradient(160deg, #1b171d 0%, #2a2127 45%, #111216 100%);
+  }
+
+  .home-bg-art {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.9;
+  }
+
+  .home-wrapper {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 12px 18px 14px;
+    overflow: hidden;
+  }
+
+  .home-pages-viewport {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .home-page {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(24px);
+    transition: opacity 0.22s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.22s;
+  }
+  .home-page.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(0);
+  }
+
+  /* Page 1 Widgets */
+  .widget-clock-card {
+    background: rgba(12, 13, 17, 0.36);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .widget-clock-btn {
+    border: none;
+    background: transparent;
+    text-align: left;
+    min-height: 44px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .widget-time {
+    font-size: 34px;
+    font-weight: 200;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+
+  .widget-date-btn {
+    border: 1px solid rgba(244, 151, 182, 0.28);
+    background: rgba(244, 151, 182, 0.12);
+    border-radius: 12px;
+    padding: 6px 10px;
+    min-height: 44px;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .widget-date-main {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-1);
+  }
+  .widget-date-sub {
+    font-size: 10.5px;
+    color: var(--pink);
+    margin-top: 2px;
+  }
+
+  /* Partner Vital Widget */
+  .widget-vital {
+    width: 100%;
+    border: 1px solid rgba(244, 151, 182, 0.24);
+    background: rgba(16, 17, 22, 0.62);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 13px 15px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .vital-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10.5px;
+    color: var(--text-2);
+    letter-spacing: 0.04em;
+  }
+
+  .vital-live-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--pink);
+    font-weight: 600;
+  }
+  .pulse-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--pink-strong);
+    box-shadow: 0 0 8px var(--pink-strong);
+    animation: pulseGlow 1.8s infinite;
+  }
+  @keyframes pulseGlow {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.45; transform: scale(0.8); }
+  }
+
+  .vital-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .vital-box {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 11px;
+    padding: 7px 8px;
+  }
+  .vital-label {
+    font-size: 9.5px;
+    color: var(--text-3);
+    margin-bottom: 2px;
+  }
+  .vital-val {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text-1);
+  }
+  .vital-val.pink { color: var(--pink); }
+  .vital-val.emerald { color: var(--emerald); }
+
+  .wallpaper-note-pill {
+    margin-top: auto;
+    margin-bottom: 10px;
+    align-self: center;
+    background: rgba(10, 11, 14, 0.56);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 99px;
+    padding: 5px 12px;
+    font-size: 10.5px;
+    color: rgba(244, 245, 247, 0.78);
+    pointer-events: none;
+  }
+
+  /* Page 2 Folders */
+  .page2-header {
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .folders-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    padding-top: 4px;
+  }
+
+  .folder-card {
+    background: rgba(14, 16, 21, 0.74);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 22px;
+    padding: 13px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 9px;
+    min-height: 158px;
+    text-align: center;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  .folder-mini-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 7px;
+  }
+
+  .mini-app-icon {
+    height: 40px;
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  .folder-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-1);
+    letter-spacing: 0.02em;
+  }
+  .folder-sub {
+    font-size: 10px;
+    color: var(--text-3);
+    margin-top: -5px;
+  }
+
+  /* Page Switcher */
+  .page-switcher {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 8px 0 10px;
+  }
+
+  .page-switch-btn {
+    min-width: 44px;
+    min-height: 36px;
+    padding: 6px 12px;
+    border-radius: 99px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(14, 16, 21, 0.62);
+    color: var(--text-2);
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+  .page-switch-btn.active {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.32);
+    color: var(--text-1);
+  }
+
+  /* Bottom Dock */
+  .home-dock {
+    background: rgba(14, 16, 21, 0.72);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    border-radius: 26px;
+    padding: 10px 12px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .dock-btn {
+    border: none;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    min-height: 60px;
+    justify-content: center;
+    border-radius: 16px;
+  }
+
+  .dock-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+  }
+  .dock-icon.phone { background: linear-gradient(145deg, #1f2937, #111827); color: var(--emerald); }
+  .dock-icon.talk { background: linear-gradient(145deg, #271a22, #151218); color: var(--pink); }
+  .dock-icon.cam { background: linear-gradient(145deg, #252830, #121418); color: #e2e8f0; }
+  .dock-icon.gal { background: linear-gradient(145deg, #2d1f26, #18131a); color: #fda4af; }
+
+  .dock-label {
+    font-size: 10.5px;
+    font-weight: 500;
+    color: var(--text-2);
+  }
+
+  /* Folder Overlay Modal */
+  .modal-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 60;
+    background: rgba(5, 6, 9, 0.78);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.18s ease, visibility 0.18s;
+  }
+  .modal-backdrop.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .folder-modal {
+    width: 100%;
+    max-width: 340px;
+    background: #14171d;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 26px;
+    padding: 18px;
+    box-shadow: 0 24px 50px rgba(0, 0, 0, 0.7);
+  }
+
+  .folder-modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .folder-modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .modal-close-btn {
+    min-width: 44px;
+    min-height: 44px;
+    border: none;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    font-size: 16px;
+    color: var(--text-1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .folder-apps-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .folder-app-tile {
+    background: var(--surface-2);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 12px 10px;
+    min-height: 82px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-align: center;
+  }
+  .folder-app-tile .tile-ico {
+    font-size: 22px;
+  }
+  .folder-app-tile .tile-name {
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+  .folder-app-tile .tile-sub {
+    font-size: 9.5px;
+    color: var(--text-3);
+  }
+
+  /* ================= COMMON APP CHROME ================= */
+  .app-header {
+    height: 54px;
+    padding: 0 12px;
+    background: rgba(15, 17, 22, 0.96);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .app-back-btn {
+    min-width: 44px;
+    min-height: 44px;
+    border: none;
+    background: transparent;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: var(--text-1);
+  }
+  .app-back-btn:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .app-title-wrap {
+    flex: 1;
+    min-width: 0;
+  }
+  .app-title {
+    font-size: 15px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .app-subtitle {
+    font-size: 10.5px;
+    color: var(--text-3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .app-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 14px 16px 22px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .app-body::-webkit-scrollbar {
+    width: 4px;
+  }
+  .app-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.14);
+    border-radius: 4px;
+  }
+
+  /* Segmented Tabs */
+  .seg-tabs {
+    display: flex;
+    background: var(--surface-1);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 13px;
+    padding: 4px;
+    gap: 4px;
+    margin-bottom: 14px;
+  }
+  .seg-tab {
+    flex: 1;
+    min-height: 38px;
+    border: none;
+    background: transparent;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-2);
+    transition: background 0.15s, color 0.15s;
+  }
+  .seg-tab.active {
+    background: var(--surface-3);
+    color: var(--text-1);
+  }
+
+  /* Reusable Cards & Lists */
+  .card {
+    background: var(--surface-1);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: var(--radius-card);
+    padding: 14px;
+    margin-bottom: 11px;
+  }
+  .card.pink-tint {
+    border-color: rgba(244, 151, 182, 0.28);
+    background: linear-gradient(145deg, rgba(244, 151, 182, 0.09), rgba(21, 23, 28, 0.96));
+  }
+  .card.crimson-tint {
+    border-color: rgba(224, 60, 78, 0.3);
+    background: linear-gradient(145deg, rgba(224, 60, 78, 0.1), rgba(21, 23, 28, 0.96));
+  }
+
+  .list-item {
+    width: 100%;
+    text-align: left;
+    background: var(--surface-1);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 15px;
+    padding: 12px 13px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 60px;
+  }
+
+  .avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 15px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+    background: var(--surface-3);
+    color: var(--text-1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .avatar.ryua {
+    background: linear-gradient(135deg, #ffd1e3, #f497b6);
+    color: #3a1020;
+  }
+  .avatar.yujin {
+    background: #040506;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+  .avatar.crimson {
+    background: var(--crimson-soft);
+    color: #ff7b89;
+    border-color: rgba(224, 60, 78, 0.25);
+  }
+  .avatar.family {
+    background: rgba(52, 211, 153, 0.14);
+    color: var(--emerald);
+  }
+
+  .item-main {
+    flex: 1;
+    min-width: 0;
+  }
+  .item-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    margin-bottom: 3px;
+  }
+  .item-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-1);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .item-time {
+    font-size: 10.5px;
+    color: var(--text-3);
+    flex-shrink: 0;
+  }
+  .item-sub {
+    font-size: 12px;
+    color: var(--text-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .badge-red {
+    background: var(--crimson);
+    color: #fff;
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 99px;
+    flex-shrink: 0;
+  }
+  .badge-pill {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-2);
+  }
+  .badge-pill.pink { background: var(--pink-soft); color: var(--pink); }
+  .badge-pill.crimson { background: var(--crimson-soft); color: #ff7b89; }
+  .badge-pill.emerald { background: rgba(52, 211, 153, 0.16); color: var(--emerald); }
+
+  /* ================= CHAT ROOM ================= */
+  .chat-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 14px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .chat-body.sakura-theme {
+    background:
+      radial-gradient(circle at 18% 15%, rgba(255, 205, 224, 0.22), transparent 35%),
+      radial-gradient(circle at 82% 75%, rgba(244, 151, 182, 0.18), transparent 40%),
+      linear-gradient(180deg, #2b1d24 0%, #241920 55%, #1d151b 100%);
+  }
+
+  .chat-date-divider {
+    align-self: center;
+    font-size: 10.5px;
+    color: rgba(255, 255, 255, 0.72);
+    background: rgba(0, 0, 0, 0.35);
+    padding: 4px 12px;
+    border-radius: 99px;
+    margin: 4px 0;
+  }
+
+  .msg-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 7px;
+    max-width: 88%;
+  }
+  .msg-row.me {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+  }
+  .msg-row.other {
+    align-self: flex-start;
+  }
+
+  .msg-sender {
+    font-size: 10.5px;
+    color: var(--text-2);
+    margin: 0 0 3px 4px;
+  }
+
+  .msg-bubble {
+    padding: 10px 13px;
+    border-radius: 17px;
+    font-size: 12.8px;
+    line-height: 1.48;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+  .msg-row.other .msg-bubble {
+    background: rgba(255, 255, 255, 0.94);
+    color: #191b20;
+    border-bottom-left-radius: 5px;
+  }
+  .msg-row.me .msg-bubble {
+    background: #171920;
+    color: #f4f5f7;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-bottom-right-radius: 5px;
+  }
+  .sakura-theme .msg-row.me .msg-bubble {
+    background: linear-gradient(135deg, #252028, #17151b);
+    border-color: rgba(244, 151, 182, 0.32);
+  }
+
+  .msg-time {
+    font-size: 9.5px;
+    color: rgba(255, 255, 255, 0.55);
+    flex-shrink: 0;
+    margin-bottom: 2px;
+  }
+
+  .sticker-card {
+    background: rgba(255, 232, 241, 0.95);
+    color: #4a1529;
+    border-radius: 16px;
+    padding: 10px 12px;
+    text-align: center;
+    font-size: 11.5px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+  }
+  .sticker-emoji {
+    font-size: 28px;
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  .voice-msg-btn {
+    border: 1px solid rgba(244, 151, 182, 0.38);
+    background: rgba(24, 21, 28, 0.92);
+    color: var(--text-1);
+    border-radius: 16px;
+    padding: 10px 12px;
+    min-width: 215px;
+    min-height: 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: left;
+  }
+  .voice-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .voice-play-ico {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--pink);
+    color: #1f0a12;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .voice-bars {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 18px;
+  }
+  .voice-bar {
+    width: 3px;
+    border-radius: 2px;
+    background: rgba(244, 151, 182, 0.5);
+    transition: height 0.2s;
+  }
+  .voice-msg-btn.playing .voice-bar {
+    background: var(--pink-strong);
+    animation: eqBar 0.65s infinite alternate;
+  }
+  @keyframes eqBar {
+    from { transform: scaleY(0.45); }
+    to { transform: scaleY(1.25); }
+  }
+  .voice-transcript {
+    font-size: 11.5px;
+    color: #ffdbe8;
+    line-height: 1.45;
+    padding-top: 4px;
+    border-top: 1px dashed rgba(244, 151, 182, 0.25);
+  }
+
+  /* ================= GALLERY ================= */
+  .album-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 11px;
+  }
+  .album-card {
+    background: var(--surface-1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    overflow: hidden;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+  }
+  .album-cover {
+    height: 108px;
+    width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+  }
+  .album-info {
+    padding: 10px 12px;
+  }
+  .album-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .album-count {
+    font-size: 11px;
+    color: var(--text-3);
+  }
+
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .photo-thumb {
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--surface-2);
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+  }
+  .photo-art {
+    height: 110px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-size: 28px;
+  }
+  .photo-cap {
+    padding: 8px 9px;
+    font-size: 11px;
+    line-height: 1.35;
+    color: var(--text-2);
+  }
+
+  /* ================= CALENDAR ================= */
+  .cal-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .cal-month-btn {
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--surface-2);
+    color: var(--text-1);
+    font-size: 14px;
+  }
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 14px;
+  }
+  .cal-dow {
+    text-align: center;
+    font-size: 10.5px;
+    color: var(--text-3);
+    padding: 4px 0;
+  }
+  .cal-cell {
+    min-height: 44px;
+    border-radius: 11px;
+    border: 1px solid transparent;
+    background: var(--surface-1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    font-size: 12px;
+    font-weight: 500;
+    position: relative;
+  }
+  .cal-cell.empty {
+    background: transparent;
+    pointer-events: none;
+  }
+  .cal-cell.selected {
+    border-color: var(--text-1);
+    background: var(--surface-3);
+  }
+  .cal-cell.cycle-shade {
+    background: rgba(244, 151, 182, 0.14);
+  }
+  .cal-cell.bday {
+    background: rgba(224, 60, 78, 0.22);
+    border-color: var(--pink-strong);
+    color: #fff;
+    font-weight: 700;
+  }
+  .cal-dots {
+    display: flex;
+    gap: 3px;
+    height: 6px;
+    align-items: center;
+  }
+  .cal-dot-gray { width: 5px; height: 5px; border-radius: 50%; background: #717885; }
+  .cal-dot-pink { width: 6px; height: 6px; border-radius: 50%; background: var(--pink-strong); }
+  .cal-star { font-size: 9px; color: var(--pink-strong); line-height: 1; }
+
+  /* ================= ALARM SWITCH ================= */
+  .alarm-card {
+    background: var(--surface-1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 14px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .alarm-time {
+    font-size: 26px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+  }
+  .alarm-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .alarm-meta {
+    font-size: 10.5px;
+    color: var(--text-3);
+    margin-top: 3px;
+  }
+
+  .toggle-switch {
+    min-width: 52px;
+    min-height: 44px;
+    border: none;
+    background: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .toggle-track {
+    width: 48px;
+    height: 28px;
+    border-radius: 99px;
+    background: #323640;
+    position: relative;
+    transition: background 0.2s;
+  }
+  .toggle-switch.on .toggle-track {
+    background: var(--emerald);
+  }
+  .toggle-knob {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    transition: transform 0.2s;
+  }
+  .toggle-switch.on .toggle-knob {
+    transform: translateX(20px);
+  }
+
+  /* ================= AUDIO PLAYER ================= */
+  .player-hero {
+    background: linear-gradient(155deg, #211c24 0%, #12141a 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 22px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .player-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 12px;
+  }
+  .player-btn {
+    min-width: 46px;
+    min-height: 46px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-1);
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .player-btn.primary {
+    width: 54px;
+    height: 54px;
+    background: var(--text-1);
+    color: #0b0c0e;
+    font-size: 18px;
+    border: none;
+  }
+
+  .progress-bar-bg {
+    width: 100%;
+    height: 5px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.12);
+    margin-top: 12px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    width: 38%;
+    background: linear-gradient(90deg, var(--pink), #fff);
+    border-radius: 99px;
+    transition: width 0.35s linear;
+  }
+
+  /* ================= TOAST ================= */
+  .toast {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 64px;
+    z-index: 90;
+    background: rgba(22, 25, 32, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: var(--text-1);
+    padding: 11px 14px;
+    border-radius: 14px;
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: center;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ================= CALL OVERLAY ================= */
+  .call-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 75;
+    background: linear-gradient(180deg, #17141a 0%, #0a0b0f 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 64px 24px 48px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s, visibility 0.2s;
+  }
+  .call-overlay.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .hangup-btn {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    border: none;
+    background: var(--crimson);
+    color: #fff;
+    font-size: 24px;
+    box-shadow: 0 10px 26px rgba(224, 60, 78, 0.45);
+  }
+
+  /* Mobile Fullscreen Adaptation */
+  @media (max-width: 480px) {
+    body {
+      padding: 0;
+      background: #0c0d10;
+    }
+    .device-wrapper {
+      width: 100%;
+      height: 100dvh;
+      max-height: none;
+    }
+    .phone-frame {
+      border-radius: 0;
+      padding: 0;
+      box-shadow: none;
+    }
+    .phone-screen, .sapphire-sheen {
+      border-radius: 0;
+    }
+    .hw-power-btn {
+      display: none;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="ambient-glow"></div>
+
+<div class="device-wrapper">
+  <div class="phone-frame">
+    <button class="hw-power-btn" id="hwPowerBtn" title="화면 잠금 / 깨우기" aria-label="전원 버튼"></button>
+
+    <div class="phone-screen" id="phoneScreen">
+      <div class="sapphire-sheen"></div>
+
+      <!-- Status Bar -->
+      <header class="status-bar">
+        <div class="status-left">
+          <span id="statusTime">14:33</span>
+          <span title="한류아·코드레드 외 알림 차단">🌙</span>
+        </div>
+        <div class="status-notch">
+          <span class="notch-lens"></span>
+          <span class="notch-dot"></span>
+        </div>
+        <div class="status-right">
+          <span class="status-storage">412GB/1TB</span>
+          <span>5G</span>
+          <span class="battery-pill">
+            <span id="batteryPct">92%</span>
+            <span class="battery-icon"><span class="battery-fill"></span></span>
+          </span>
+        </div>
+      </header>
+
+      <!-- Main Screen Stack -->
+      <main class="screen-stack" id="screenStack">
+
+        <!-- 1. LOCK SCREEN -->
+        <section class="screen active" id="screen-lock" data-screen="lock">
+          <div class="lock-bg"></div>
+          <!-- Maldives Beach Atmospheric SVG Art -->
+          <svg viewBox="0 0 380 760" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0.92;">
+            <defs>
+              <radialGradient id="sunGlow" cx="76%" cy="20%" r="42%">
+                <stop offset="0%" stop-color="#fff9e2" stop-opacity="0.88"/>
+                <stop offset="45%" stop-color="#ffd5e5" stop-opacity="0.28"/>
+                <stop offset="100%" stop-color="#fff7d6" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="pinkBokeh" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#ffc2d9" stop-opacity="0.45"/>
+                <stop offset="100%" stop-color="#f497b6" stop-opacity="0"/>
+              </radialGradient>
+              <linearGradient id="seaShimmer" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#22b8cf" stop-opacity="0.45"/>
+                <stop offset="60%" stop-color="#0f766e" stop-opacity="0.28"/>
+                <stop offset="100%" stop-color="#e9decb" stop-opacity="0.5"/>
+              </linearGradient>
+            </defs>
+            <circle cx="288" cy="155" r="155" fill="url(#sunGlow)"/>
+            <!-- Horizon & Water-pool villa deck lines -->
+            <line x1="0" y1="422" x2="380" y2="422" stroke="rgba(255,255,255,0.28)" stroke-width="1"/>
+            <path d="M0 422 Q95 415 190 424 T380 420 L380 580 L0 580 Z" fill="url(#seaShimmer)"/>
+            <path d="M0 478 Q120 468 240 482 T380 474" stroke="rgba(255,255,255,0.22)" stroke-width="1.2" fill="none"/>
+            <path d="M0 520 Q100 512 210 524 T380 516" stroke="rgba(255,255,255,0.16)" stroke-width="1" fill="none"/>
+            <!-- Soft rose-pink wind & sunlight bokeh trails -->
+            <circle cx="150" cy="360" r="68" fill="url(#pinkBokeh)"/>
+            <circle cx="235" cy="325" r="46" fill="url(#pinkBokeh)"/>
+            <circle cx="195" cy="405" r="82" fill="url(#pinkBokeh)"/>
+            <path d="M85 372 Q165 335 255 362 T340 338" stroke="rgba(255,209,227,0.34)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M60 398 Q155 365 245 388 T335 370" stroke="rgba(244,151,182,0.26)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <!-- Delicate golden sunlight sparkles on emerald sea -->
+            <circle cx="264" cy="442" r="2.2" fill="#fff7d6" opacity="0.85"/>
+            <circle cx="242" cy="458" r="1.6" fill="#fff7d6" opacity="0.7"/>
+            <circle cx="282" cy="466" r="1.8" fill="#ffd1e3" opacity="0.75"/>
+            <circle cx="212" cy="448" r="1.4" fill="#fff" opacity="0.65"/>
+          </svg>
+          <div class="lock-bg-overlay"></div>
+
+          <div class="lock-content">
+            <div class="lock-top-meta">
+              <span class="lock-device-tag">ARCH-Terminal Pro · Vanguard Custom</span>
+              <div class="lock-clock" id="lockClock">14:33</div>
+              <div class="lock-date" id="lockDate">4월 8일 수요일</div>
+            </div>
+
+            <div>
+              <div class="lock-photo-caption">
+                <div class="cap-title">
+                  <span>🏝️ 몰디브 워터풀 빌라 해변 · 지난겨울</span>
+                  <span>사파이어 글래스</span>
+                </div>
+                <div class="cap-desc">에메랄드빛 수평선과 하얀 모래사장 위, 바닷바람에 분홍빛 웨이브 머리카락을 흩날리며 뒤돌아보는 한류아의 반짝이는 고양이 눈매.</div>
+              </div>
+
+              <div class="lock-filter-pill">
+                🔕 알림 차단 중 — <strong>한류아 직통 회선</strong> &amp; <strong>아크 코드 레드</strong>만 허용
+              </div>
+
+              <button class="iris-unlock-btn tap-scale" id="irisUnlockBtn">
+                <span class="iris-ring"><span class="iris-ring-inner"></span></span>
+                <span id="irisUnlockText">생체 홍채 인식으로 잠금 해제 (0.1초)</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. HOME SCREEN -->
+        <section class="screen" id="screen-home" data-screen="home">
+          <div class="home-bg"></div>
+          <!-- Intimate Atmospheric Wallpaper Art (Oversized shirt + warm blush tone) -->
+          <svg class="home-bg-art" viewBox="0 0 380 760" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <radialGradient id="blushGlow" cx="50%" cy="54%" r="36%">
+                <stop offset="0%" stop-color="#ffb8cf" stop-opacity="0.42"/>
+                <stop offset="60%" stop-color="#e089a8" stop-opacity="0.14"/>
+                <stop offset="100%" stop-color="#0b0c10" stop-opacity="0"/>
+              </radialGradient>
+              <linearGradient id="shirtDark" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#22252e" stop-opacity="0.72"/>
+                <stop offset="100%" stop-color="#0f1116" stop-opacity="0.9"/>
+              </linearGradient>
+            </defs>
+            <circle cx="192" cy="410" r="170" fill="url(#blushGlow)"/>
+            <!-- Soft white pillow folds -->
+            <path d="M0 490 Q110 455 210 478 T380 465 L380 760 L0 760 Z" fill="#f3e6ec" opacity="0.1"/>
+            <!-- Soft pink hair waves + cheek blush silhouette -->
+            <path d="M90 380 C115 320 250 315 288 380 C308 425 285 485 255 510 C205 530 140 520 105 492 C78 462 72 422 90 380 Z" fill="#f497b6" opacity="0.22"/>
+            <ellipse cx="190" cy="422" rx="64" ry="54" fill="#ffe0ea" opacity="0.18"/>
+            <circle cx="164" cy="434" r="14" fill="#ff7aa8" opacity="0.24"/>
+            <circle cx="216" cy="434" r="14" fill="#ff7aa8" opacity="0.24"/>
+            <!-- Loose dark shirt collar drape -->
+            <path d="M95 515 Q190 475 285 515 L320 670 L60 670 Z" fill="url(#shirtDark)"/>
+          </svg>
+
+          <div class="home-wrapper">
+            <div class="home-pages-viewport" id="homePagesViewport">
+
+              <!-- HOME PAGE 1 -->
+              <div class="home-page active" id="homePage1" data-page="1">
+                <!-- Transparent Clock Widget -->
+                <div class="widget-clock-card">
+                  <button class="widget-clock-btn tap-scale" data-open-app="clock">
+                    <span class="widget-time" id="homeClock">14:33</span>
+                    <span style="font-size:10.5px;color:var(--text-2);margin-top:2px;">알람 3개 활성화 · 터치하여 열기</span>
+                  </button>
+                  <button class="widget-date-btn tap-scale" data-open-app="calendar">
+                    <span class="widget-date-main">4월 8일 (수)</span>
+                    <span class="widget-date-sub">D-1 내 거 생일 ♡</span>
+                  </button>
+                </div>
+
+                <!-- Harmony Partner Vital & Resonance Monitor Widget -->
+                <button class="widget-vital tap-scale" data-open-app="vital">
+                  <div class="vital-header">
+                    <span>HARMONY · 파트너 실시간 바이탈 &amp; 파장 공명</span>
+                    <span class="vital-live-dot"><span class="pulse-dot"></span>SYNC</span>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;">
+                    <div style="font-size:13.5px;font-weight:700;">한류아 <span style="font-weight:400;color:var(--pink);font-size:11.5px;">(루미너스 · 배우자)</span></div>
+                    <span class="badge-pill emerald">안정 · 거실 소파</span>
+                  </div>
+                  <div class="vital-metrics">
+                    <div class="vital-box">
+                      <div class="vital-label">심박수</div>
+                      <div class="vital-val pink" id="vitalBpm">72 BPM</div>
+                    </div>
+                    <div class="vital-box">
+                      <div class="vital-label">파장 공명률</div>
+                      <div class="vital-val emerald" id="vitalSync">98.4%</div>
+                    </div>
+                    <div class="vital-box">
+                      <div class="vital-label">체온 / 스트레스</div>
+                      <div class="vital-val">36.4°C · 낮음</div>
+                    </div>
+                  </div>
+                </button>
+
+                <div class="wallpaper-note-pill">배경: 셔츠를 걸친 채 잠든 한류아 (비공개 독점 설정)</div>
+              </div>
+
+              <!-- HOME PAGE 2 (4 Black Translucent Folders) -->
+              <div class="home-page" id="homePage2" data-page="2">
+                <div class="page2-header">
+                  <span>ARCH-OS · 페이지 2</span>
+                  <span>게임 앱 없음</span>
+                </div>
+
+                <div class="folders-grid" id="foldersGrid">
+                  <button class="folder-card tap-scale" data-folder="arch">
+                    <div class="folder-mini-grid">
+                      <div class="mini-app-icon">🏛️</div>
+                      <div class="mini-app-icon">🗺️</div>
+                      <div class="mini-app-icon">📡</div>
+                      <div class="mini-app-icon">📋</div>
+                    </div>
+                    <div class="folder-name">[ARCH]</div>
+                    <div class="folder-sub">아크 넷 · 지형 · 파장 · 예약</div>
+                  </button>
+
+                  <button class="folder-card tap-scale" data-folder="dot">
+                    <div class="folder-mini-grid">
+                      <div class="mini-app-icon">📷</div>
+                      <div class="mini-app-icon">𝕏</div>
+                      <div class="mini-app-icon">🌐</div>
+                      <div class="mini-app-icon">💬</div>
+                    </div>
+                    <div class="folder-name">[ . ]</div>
+                    <div class="folder-sub">인스타 · X · 브라우저 · 익명</div>
+                  </button>
+
+                  <button class="folder-card tap-scale" data-folder="private">
+                    <div class="folder-mini-grid">
+                      <div class="mini-app-icon">🏦</div>
+                      <div class="mini-app-icon">🛍️</div>
+                      <div class="mini-app-icon">💎</div>
+                      <div class="mini-app-icon">🍓</div>
+                    </div>
+                    <div class="folder-name">[Private]</div>
+                    <div class="folder-sub">뱅킹 · 장바구니 · 파인다이닝 · 배달</div>
+                  </button>
+
+                  <button class="folder-card tap-scale" data-folder="etc">
+                    <div class="folder-mini-grid">
+                      <div class="mini-app-icon">📝</div>
+                      <div class="mini-app-icon">📅</div>
+                      <div class="mini-app-icon">⏰</div>
+                      <div class="mini-app-icon">🎧</div>
+                    </div>
+                    <div class="folder-name">[Etc]</div>
+                    <div class="folder-sub">메모 · 캘린더 · 알람 · 오디오</div>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Page Switcher -->
+            <div class="page-switcher">
+              <button class="page-switch-btn active tap-scale" data-switch-page="1">● 홈 1</button>
+              <button class="page-switch-btn tap-scale" data-switch-page="2">○ 폴더 (2)</button>
+            </div>
+
+            <!-- Bottom Dock -->
+            <nav class="home-dock" aria-label="하단 독 바">
+              <button class="dock-btn tap-scale" data-open-app="phone">
+                <span class="dock-icon phone">📞</span>
+                <span class="dock-label">전화</span>
+              </button>
+              <button class="dock-btn tap-scale" data-open-app="messenger">
+                <span class="dock-icon talk">💬</span>
+                <span class="dock-label">아크 톡</span>
+              </button>
+              <button class="dock-btn tap-scale" data-open-app="camera">
+                <span class="dock-icon cam">📸</span>
+                <span class="dock-label">카메라</span>
+              </button>
+              <button class="dock-btn tap-scale" data-open-app="gallery">
+                <span class="dock-icon gal">🖼️</span>
+                <span class="dock-label">갤러리</span>
+              </button>
+            </nav>
+          </div>
+        </section>
+
+        <!-- 3. PHONE APP -->
+        <section class="screen" id="screen-phone" data-screen="phone">
+          <div class="app-header">
+            <button class="app-back-btn tap-scale" data-action="back" aria-label="뒤로 가기">←</button>
+            <div class="app-title-wrap">
+              <div class="app-title">전화</div>
+              <div class="app-subtitle">최근 통화 80% 이상 · [내 거 ♡]</div>
+            </div>
+          </div>
+          <div class="app-body" id="phoneBody"></div>
+        </section>
+
+        <!-- 4. ARCH-TALK (MESSENGER) -->
+        <section class="screen" id="screen-messenger" data-screen="messenger">
+          <div class="app-header">
+            <button class="app-back-btn tap-scale" data-action="back" aria-label="뒤로 가기">←</button>
+            <div class="app-title-wrap">
+              <div class="app-title">아크 톡 (ARCH-Talk)</div>
+              <div class="app-subtitle">아크 전용 보안 메신저 · 멀티 프로필 활성</div>
+            </div>
+          </div>
+          <div class="app-body" id="messengerBody"></div>
+        </section>
+
+        <!-- 5. CHAT ROOM DETAIL -->
+        <section class="screen" id="screen-chatroom" data-screen="chatroom">
+          <div class="app-header">
+            <button class="app-back-btn tap-scale" data-action="back" aria-label="뒤로 가기">←</button>
+            <div class="app-title-wrap">
+              <div class="app-title" id="chatRoomTitle">대화방</div>
+              <div class="app-subtitle" id="chatRoomSub">보안 암호화 연결</div>
+            </div>
+          </div>
+          <div class="chat-body" id="chatRoomBody"></div>
+        </section>
+
+        <!-- 6. CAMERA APP -->
+        <section class="screen" id="screen-camera" data-screen="camera">
+          <div class="app-header">
+            <button class="app-back-btn tap-scale" data-action="back" aria-label="뒤로 가기">←</button>
+            <div class="app-title-wrap">
+              <div class="app-title">카메라</div>
+              <div class="app-subtitle">ARCH-Optics Pro · 인물 화보 최적화</div>
+            </div>
+          </div>
+          <div class="app-body" style="display:flex;flex-direction:column;justify-content:space-between;padding:16px;">
+            <div id="camViewfinder" style="flex:1;border-radius:20px;border:1px solid rgba(255,255,255,0.14);background:radial-gradient(circle at 50% 45%, rgba(244,151,182,0.16), #0d0f14 70%);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;overflow:hidden;min-height:280px;">
+              <div style="width:150px;height:150px;border:1.5px dashed rgba(244,151,182,0.55);border-radius:18px;display:flex;align-items:center;justify-content:center;color:var(--pink);font-size:12px;">AF-EYE · 한류아</div>
+              <div id="camModeLabel" style="font-size:11px;color:var(--text-2);background:rgba(0,0,0,0.55);padding:4px 10px;border-radius:99px;">인물 사진 · 50mm f/1.4 · RAW</div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-around;padding-top:16px;">
+              <button class="tap-scale" data-open-app="gallery" style="min-width:52px;min-height:52px;border-radius:14px;border:1px solid rgba(255,255,255,0.18);background:var(--surface-2);font-size:20px;">🖼️</button>
+              <button class="tap-scale" id="camShutterBtn" style="width:68px;height:68px;border-radius:50%;border:4px solid #fff;background:rgba(255,255,255,0.16);"></button>
+              <button class="tap-scale" id="camLensBtn" style="min-width:52px;min-height:52px;border-radius:14px;border:1px solid rgba(255,255,255,0.18);background:var(--surface-2);font-size:12px;font-weight:700;">50mm</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. GALLERY APP -->
+        <section class="screen" id="screen-gallery" data-screen="gallery">
+          <div class="app-header">
+            <button class="app-back-btn tap-scale" data-action="back" aria-label="뒤로 가기">←</button>
+            <div class="app-title-wrap">
+              <div class="app-title">갤러리</div>
+              <div class="app-subtitle">전체 3,842장 · 본인 셀카 0장</div>
+            </div>
+          </div>
+          <div class="app-body" id="galleryBody"></div>
+        </section>
+
+        <!-- 8. GALLERY DETAIL / ALBUM VIEW -->
+        <section class="screen" id="screen-gallery-detail" data-screen="gallery-detail">
+          <div class="app-header">
+            <button class="app-back-btn tap-scale" data-action="back" aria-label="뒤로 가기">←</button>
+            <div class="app-title-wrap">
+              <div class="app-title" id="galleryDetailTitle">앨범</div>
+              <div class="app-subtitle" id="galleryDetailSub">상세 보기</div>
+            </div>
+          </div>
+          <div class="app-body" id="galleryDetailBody"></div>
+        </section>
+
+        <!-- 9. BROWSER APP -->
+        <section class="screen" id="screen-browser" data-screen="browser">
+          <div class="app-header">
+            <button class="app-back-btn tap-scale" data-action="back" aria-label="뒤로 가기">←</button>
+            <div class="app-title-wrap">
+              <div class="app-title">브라우저</div>
+              <div class="app-subtitle">검색 기록 · 열린 탭 4개 · 북마크</div>
+            </div>
+          </div>
+          <div class="app-body" id="browserBody"></div>
+        </section>
+
+        <!-- 10. NOTES APP -->
+        <section class="screen" id="screen-notes" data-screen="notes">
+          <div class="app-header">
+            <button class="app-back-btn tap-scale" data-action="back" aria-label="뒤로 가기">←</button>
+            <div class="app-title-wrap">
+              <div class="app-title">메모장</div>
+              <div class="app-subtitle">시간순 정렬 · 고정 메모 1개</div>
+            </div>
+          </div>
+          <div class="app-body" id="notesBody"></div>
+        </section>
+
+        <!-- 11. NOTE DETAIL -->
+        <section class="screen" id="screen-note-detail" data-screen="note-detail">
+          <div class="app-header">
+            <button class="app-back-btn tap-scale" data-action="back" aria-label="뒤로 가기">←</button>
+            <div class="app-title-wrap">
+              <div class="app-title" id="noteDetailTitle">메모</div>
+              <div class="app-subtitle" id="noteDetailSub">상세 기록</div>
+            </div>
+          </div>
+          <div class="app-body" id="noteDetailBody"></div>
+        </section>
+
+        <!-- 12. CALENDAR APP -->
+        <section class="screen" id="screen-calendar" data-screen="calendar">
+          <div class="app-header">
+            <button class="app-back-btn tap-scale" data-action="back" aria-label="뒤로 가기">←</button>
+            <div class="app-title-wrap">
+              <div class="app-title">캘린더</div>
+              <div class="app-subtitle">개인·기념일·가이딩 주기 동기화</div>
+            </div>
+          </div>
+          <div class="app-body" id="calendarBody"></div>
+        </section>
+
+        <!-- 13. CLOCK / ALARMS APP -->
+        <section class="screen" id="screen-clock" data-screen="clock">
+          <div class="app-header">
+            <button class="app-back-btn tap-scale" data-action="back" aria-label="뒤로 가기">←</button>
+            <div class="app-title-wrap">
+              <div class="app-title">시계 · 알람</div>
+              <div class="app-subtitle">커스텀 음성 알람 지정됨</div>
+            </div>
+          </div>
+          <div class="app-body" id="clockBody"></div>
+        </section>
+
+        <!-- 14. HI-FI AUDIO APP -->
+        <section class="screen" id="screen-audio" data-screen="audio">
+          <div class="app-header">
+            <button class="app-back-btn tap-scale" data-action="back" aria-label="뒤로 가기">←</button>
+            <div class="app-title-wrap">
+              <div class="app-title">하이엔드 오디오</div>
+              <div class="app-subtitle">FLAC 무손실 · 최근 재생 목록</div>
+            </div>
+          </div>
+          <div class="app-body" id="audioBody"></div>
+        </section>
+
+        <!-- 15. SHOPPING / CONCIERGE CART APP -->
+        <section class="screen" id="screen-shopping" data-screen="shopping">
+          <div class="app-header">
+            <button class="app-back-btn tap-scale" data-action="back" aria-label="뒤로 가기">←</button>
+            <div class="app-title-wrap">
+              <div class="app-title">블랙카드 컨시어지 · 장바구니</div>
+              <div class="app-subtitle">총 14개 품목 (본인 2 · 한류아 12)</div>
+            </div>
+          </div>
+          <div class="app-body" id="shoppingBody"></div>
+        </section>
+
+        <!-- 16. GENERIC UTILITY / FOLDER APP VIEW (ARCH, SNS, Delivery, Banking, Health, Vital, etc.) -->
+        <section class="screen" id="screen-utility" data-screen="utility">
+          <div class="app-header">
+            <button class="app-back-btn tap-scale" data-action="back" aria-label="뒤로 가기">←</button>
+            <div class="app-title-wrap">
+              <div class="app-title" id="utilityTitle">앱</div>
+              <div class="app-subtitle" id="utilitySub">ARCH-OS</div>
+            </div>
+          </div>
+          <div class="app-body" id="utilityBody"></div>
+        </section>
+
+      </main>
+
+      <!-- Folder Overlay Modal -->
+      <div class="modal-backdrop" id="folderBackdrop" aria-hidden="true">
+        <div class="folder-modal" id="folderModal">
+          <div class="folder-modal-head">
+            <div class="folder-modal-title" id="folderModalTitle">[ARCH]</div>
+            <button class="modal-close-btn tap-scale" id="folderCloseBtn" aria-label="폴더 닫기">✕</button>
+          </div>
+          <div class="folder-apps-grid" id="folderAppsGrid"></div>
+        </div>
+      </div>
+
+      <!-- Biometric / Password Auth Modal (Secret Album & 장부 Note) -->
+      <div class="modal-backdrop" id="authBackdrop" aria-hidden="true">
+        <div class="folder-modal" style="text-align:center;">
+          <div style="font-size:32px;margin-bottom:8px;" id="authIcon">🔐</div>
+          <div style="font-size:15px;font-weight:700;margin-bottom:6px;" id="authTitle">생체 암호 인증 필요</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.45;margin-bottom:16px;" id="authDesc">성유진(신드롬) 본인 홍채 또는 암호 확인이 필요합니다.</div>
+          <div style="display:flex;gap:8px;">
+            <button class="tap-scale" id="authCancelBtn" style="flex:1;min-height:46px;border-radius:14px;border:1px solid rgba(255,255,255,0.12);background:var(--surface-2);font-size:13px;font-weight:600;">취소</button>
+            <button class="tap-scale" id="authConfirmBtn" style="flex:1.4;min-height:46px;border-radius:14px;border:none;background:var(--pink);color:#1f0a12;font-size:13px;font-weight:700;">홍채 인증 (0.1초)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Call Simulation Overlay -->
+      <div class="call-overlay" id="callOverlay">
+        <div style="text-align:center;">
+          <div class="badge-pill emerald" style="margin-bottom:12px;">ARCH-SECURE LINE</div>
+          <div style="font-size:26px;font-weight:700;margin-bottom:6px;" id="callTargetName">내 거 ♡</div>
+          <div style="font-size:13px;color:var(--text-2);" id="callStatusText">발신 연결 중...</div>
+        </div>
+        <div style="font-size:48px;opacity:0.9;" id="callTargetAvatar">💖</div>
+        <button class="hangup-btn tap-scale" id="callHangupBtn" aria-label="통화 종료">✕</button>
+      </div>
+
+      <!-- Toast -->
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+      <!-- Bottom System Nav -->
+      <footer class="sys-nav">
+        <button class="sys-nav-btn tap-scale" id="navBackBtn" aria-label="뒤로 가기">◀ 뒤로</button>
+        <button class="sys-nav-btn home-pill tap-scale" id="navHomeBtn" aria-label="홈으로">● 홈</button>
+        <button class="sys-nav-btn tap-scale" id="navLockBtn" aria-label="잠금">🔒 잠금</button>
+      </footer>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  'use strict';
+
+  /* ================= STATE & DATA ================= */
+  const state = {
+    screenStack: ['lock'],
+    homePage: 1,
+    phoneTab: 'recent',
+    galleryTab: 'albums',
+    browserTab: 'history',
+    shoppingFilter: 'all',
+    calMonth: 4,
+    calSelectedDay: 9,
+    secretUnlocked: false,
+    ledgerUnlocked: false,
+    pendingAuthTarget: null,
+    activeAudioIdx: 3,
+    isAudioPlaying: false,
+    audioProgress: 42,
+    audioTimer: null,
+    camLensIdx: 0,
+    checkedCartIds: {},
+    alarms: [
+      { id: 'al1', time: '07:00', period: '오전', label: '기상', mode: '진동 모드 · 한류아 깨우지 않기', on: true },
+      { id: 'al2', time: '23:55', period: '오후', label: '드레스룸 금고에서 벨벳 상자 꺼내기', mode: '오늘 밤 특별 알람', on: true },
+      { id: 'al3', time: '00:00', period: '자정', label: '공주님 생일 시작 & 벌칙 12회 집행', mode: '오늘 밤 특별 알람', on: true }
+    ]
+  };
+
+  const FOLDERS = {
+    arch: {
+      title: '[ARCH]',
+      apps: [
+        { id: 'arch-net', icon: '🏛️', name: '아크 넷', sub: '기관 내부 인트라넷' },
+        { id: 'arch-terrain', icon: '🗺️', name: '지형 분석기', sub: '작전 구역 스캔' },
+        { id: 'vital', icon: '📡', name: '파장 자가 진단', sub: '센티넬 공명 진단' },
+        { id: 'arch-guide', icon: '📋', name: '가이딩 예약', sub: '실행 기록 없음' }
+      ]
+    },
+    dot: {
+      title: '[ . ]',
+      apps: [
+        { id: 'sns-insta', icon: '📷', name: '인스타그램', sub: '비공개 가계정' },
+        { id: 'sns-x', icon: '𝕏', name: 'X (구 트위터)', sub: '실시간 트렌드' },
+        { id: 'browser', icon: '🌐', name: '브라우저', sub: '검색 기록 · 탭 4' },
+        { id: 'sns-anon', icon: '💬', name: '아크 익명 커뮤니티', sub: '사내 익명 게시판' }
+      ]
+    },
+    private: {
+      title: '[Private]',
+      apps: [
+        { id: 'priv-bank', icon: '🏦', name: '프라이빗 뱅킹', sub: 'VIP 전용 계좌' },
+        { id: 'shopping', icon: '🛍️', name: '블랙카드 컨시어지', sub: '장바구니 14개' },
+        { id: 'priv-catalog', icon: '💎', name: 'VVIP 카탈로그', sub: '하이엔드 명품' },
+        { id: 'priv-dining', icon: '🍽️', name: '캐치테이블 블랙', sub: '미쉐린 파인다이닝' },
+        { id: 'priv-delivery', icon: '🍓', name: '배달 앱', sub: '한류아 야식 전용' }
+      ]
+    },
+    etc: {
+      title: '[Etc]',
+      apps: [
+        { id: 'notes', icon: '📝', name: '메모장', sub: '주의사항 · 장부' },
+        { id: 'calendar', icon: '📅', name: '캘린더', sub: '4월 9일 내 거 생일' },
+        { id: 'clock', icon: '⏰', name: '시계 · 알람', sub: '활성 알람 3개' },
+        { id: 'audio', icon: '🎧', name: '하이엔드 오디오', sub: '재즈 & 무손실 음원' },
+        { id: 'etc-diet', icon: '🥗', name: '체형·식단 분석', sub: '성분 분석기' },
+        { id: 'etc-sleep', icon: '🌙', name: '수면 사이클', sub: '수면 측정기' }
+      ]
+    }
+  };
+
+  const CALL_LOGS = [
+    { id: 'c1', name: '내 거 ♡', avatar: '🐱', cls: 'ryua', type: '발신', duration: '14분 22초', time: '어제 16:02', note: '원래 "한류아"로 저장했으나 혼인신고 직후 한류아가 단말기를 빼앗아 강제로 변경함.' },
+    { id: 'c2', name: '내 거 ♡', avatar: '🐱', cls: 'ryua', type: '수신', duration: '6분 15초', time: '어제 20:41', note: '야식 메뉴 확인 통화.' },
+    { id: 'c3', name: '내 거 ♡', avatar: '🐱', cls: 'ryua', type: '발신', duration: '3분 48초', time: '오늘 11:10', note: '점심 식사 여부 확인.' },
+    { id: 'c4', name: '여우 새끼(카이날루)', avatar: '🦊', cls: 'crimson', type: '수신 거절', duration: '-', time: '오늘 13:15', note: '용건 없이 걸려온 전화 즉시 차단.' },
+    { id: 'c5', name: '내 거 ♡', avatar: '🐱', cls: 'ryua', type: '수신', duration: '1분 52초', time: '오늘 13:40', note: '회의 끝나면 바로 연락하라는 통보.' },
+    { id: 'c6', name: '여우 새끼(카이날루)', avatar: '🦊', cls: 'crimson', type: '발신', duration: '8초', time: '어제 11:04', note: '용건만 듣고 가차 없이 종료.' },
+    { id: 'c7', name: '중2병(바이브)', avatar: '⚡', cls: '', type: '발신', duration: '45초', time: '2일 전', note: '작전 브리핑 지시.' },
+    { id: 'c8', name: '시베리아 곰탱이(리암)', avatar: '🐻', cls: '', type: '부재중 (2)', duration: '-', time: '2일 전', note: '부재중 전화 2통. 콜백 기록 없음.' },
+    { id: 'c9', name: '여우 새끼(카이날루)', avatar: '🦊', cls: 'crimson', type: '수신', duration: '12초', time: '3일 전', note: '12초 만에 종료.' },
+    { id: 'c10', name: '부산 장모님', avatar: '🌸', cls: 'family', type: '수신', duration: '21분 10초', time: '4일 전', note: '처가 어른 안부 전화. 깍듯하게 20분 이상 응대.' }
+  ];
+
+  const CHATS = [
+    {
+      id: 'ryua',
+      name: '내 거 ♡',
+      pinned: true,
+      muted: false,
+      unread: 0,
+      avatar: '🎀',
+      cls: 'ryua',
+      theme: 'sakura',
+      time: '14:03',
+      preview: '(얼굴이 시뻘게진 고양이 스티커 × 5)',
+      sub: '분홍 리본 고양이 프로필 · 연분홍 벚꽃 테마',
+      messages: [
+        { type: 'divider', text: '오늘 · 전술 회의 도중' },
+        { sender: 'other', name: '내 거 ♡', text: '보고서 다 썼다! 너 아직도 회의 중이야?', time: '14:00' },
+        { sender: 'other', sticker: true, emoji: '😾', label: '뾰로통한 분홍 고양이 이모티콘', time: '14:00' },
+        { sender: 'me', text: '회의실 구석에 앉아 있는 중. 늙다리들 똑같은 소리 삼십 분째 재탕이라 불 질러버리고 싶네.', time: '14:00 (14초 뒤)' },
+        { sender: 'other', name: '내 거 ♡', text: '미쳤어?! 얌전히 듣고 빨리 끝나면 연락해 ㅋㅋ 아 맞다 내일 내 생일인 거 안 잊었지?', time: '14:01' },
+        { sender: 'me', text: '잊을 리가 있나, 공주님. 자정 땡 치자마자 네가 밀린 벌 열두 번까지 합쳐서 밤새도록 아주 성대하게 축하해 줄 테니까 각오하고 있어.', time: '14:01' },
+        { sender: 'other', name: '내 거 ♡', text: '야!! 누가 그런 걸로 축하해 달래 변태 새끼야!! 자정 전까지는 손끝도 대지 마!!', time: '14:02' },
+        { sender: 'me', voice: true, duration: '0:06', transcript: '“손끝 안 대는 대신 자정 넘어가면 울면서 빌어도 안 봐준다, 한류아.” (배경: 회의실 웅성거리는 소음 · 나른한 미성)', time: '14:02' },
+        { sender: 'other', sticker: true, emoji: '🙀🙀🙀🙀🙀', label: '얼굴이 시뻘게진 고양이 스티커 5연속 도배', time: '14:03' }
+      ]
+    },
+    {
+      id: 'vanguard2',
+      name: '뱅가드 2팀 작전방 (4)',
+      pinned: false,
+      muted: true,
+      unread: 27,
+      avatar: '🛡️',
+      cls: 'crimson',
+      theme: 'dark',
+      time: '14:08',
+      preview: '카이날루: Hey Syndrome, 회의 시간에 마누라랑 카톡 하느라...',
+      sub: '알림 꺼짐 · 미확인 메시지 27개 (미입장 상태)',
+      messages: [
+        { type: 'divider', text: '읽지 않은 메시지 27개 · 팀장 멀티 프로필: [건드리면 죽인다]' },
+        { sender: 'other', name: '중2병(바이브)', text: '형님 내일 제수씨 생일이라꼬 오늘 야간 순찰 째는 건 아니지예? 아 또 읽씹하네 진짜', time: '13:45' },
+        { sender: 'other', name: '시베리아 곰탱이(리암)', text: '팀장님. 보고서 결재. 부탁합니다. 무섭습니다.', time: '13:52' },
+        { sender: 'other', name: '여우 새끼(카이날루)', text: 'Hey Syndrome, 회의 시간에 마누라랑 카톡 하느라 입꼬리 귀에 걸린 거 위성 사진으로도 찍혔겠다 lol', time: '14:08' }
+      ]
+    },
+    {
+      id: 'vanguard-notice',
+      name: 'VANGUARD 공지 채널',
+      pinned: false,
+      muted: true,
+      unread: 3,
+      avatar: '📢',
+      cls: '',
+      theme: 'dark',
+      time: '오전 10:00',
+      preview: '[코드 레드 외 일반 공지] 4월 전술 평가 일정 안내',
+      sub: '아크 최고위 간부 및 팀장급 전용',
+      messages: [
+        { type: 'divider', text: '오늘' },
+        { sender: 'other', name: '아크 중앙 통제실', text: '[공지] 구 시네마 콤플렉스 괴수 소각 작전 완료 보고가 접수되었습니다. (소요 시간: 9초 · 신드롬)', time: '09:10' },
+        { sender: 'other', name: '아크 중앙 통제실', text: '[결재 완료] 뱅가드 2팀장 성유진 — 4월 9일 개인 연차 승인 완료.', time: '10:00' }
+      ]
+    },
+    {
+      id: 'harmony-bot',
+      name: '파트너 파장 정기 리포트 봇',
+      pinned: false,
+      muted: true,
+      unread: 1,
+      avatar: '💠',
+      cls: '',
+      theme: 'dark',
+      time: '어제',
+      preview: '[주간 리포트] 성유진 ♥ 한류아 공명 안정도 98.4%',
+      sub: '하모니 부서 코어팀 자동 발송',
+      messages: [
+        { type: 'divider', text: '주간 정기 리포트' },
+        { sender: 'other', name: '하모니 코어팀 봇', text: '파트너(한류아 · 루미너스)와의 최근 7일 평균 파장 공명률은 98.4%로 최상위 안정 구간을 유지 중입니다. 별도 외부 가이딩 예약이 불필요합니다.', time: '어제 09:00' }
+      ]
+    },
+    {
+      id: 'busan-family',
+      name: '부산 가족방',
+      pinned: false,
+      muted: false,
+      unread: 0,
+      avatar: '🌷',
+      cls: 'family',
+      theme: 'dark',
+      time: '어제',
+      preview: '장모님, 꽃보다 장모님이 더 고우십니다. 조만간 류아 데리고...',
+      sub: '한류아 본가 식구들 · 사회생활 만렙 모드',
+      messages: [
+        { type: 'divider', text: '어제' },
+        { sender: 'other', name: '부산 장모님', text: '🌸 [사진: 부산 해운대 산책로에 활짝 핀 봄꽃]\n유진 서방, 서울도 꽃 많이 폈지? 류아랑 잘 지내지?', time: '어제 15:20' },
+        { sender: 'me', text: '장모님, 꽃보다 장모님이 더 고우십니다. 조만간 류아 데리고 인사드리러 가겠습니다.', time: '어제 15:21' }
+      ]
+    }
+  ];
+
+  const GALLERY_ALBUMS = {
+    ryua: {
+      title: '한류아',
+      count: '2,914장',
+      coverBg: 'linear-gradient(135deg, #3a2330, #f497b6)',
+      coverIcon: '🎀',
+      locked: false,
+      items: [
+        { id: 'p1', title: '몰디브 해변 · 반지 끼워주던 순간', date: '지난겨울', art: '💍', bg: 'linear-gradient(135deg,#0d6e78,#f497b6)', desc: '에메랄드빛 해변에서 반지를 끼워주던 찰나, 눈물방울이 맺힌 채 올려다보는 얼굴. 15년 차 베테랑 카메라 연기자 출신답게 완벽한 구도와 색감.' },
+        { id: 'p2', title: '디저트 카페 · 딸기 타르트', date: '3월 29일', art: '🍓', bg: 'linear-gradient(135deg,#3d1d29,#e06c88)', desc: '입가에 생크림을 묻힌 채 딸기 타르트를 오물거리는 일상 스냅샷. 아웃포커싱과 자연광이 화보집 수준.' },
+        { id: 'p3', title: '명동 밤거리 · 슈크림 붕어빵', date: '3월 18일', art: '🐟', bg: 'linear-gradient(135deg,#1d243b,#d99a5b)', desc: '명동 밤거리 네온사인 아래, 따뜻한 붕어빵 봉투를 품에 안고 해맑게 웃는 옆모습.' },
+        { id: 'p4', title: '침대 시트 위 · 셔츠 차림 (홈 배경 원본)', date: '4월 6일', art: '🌙', bg: 'linear-gradient(135deg,#2b1c26,#e5a3b8)', desc: '성유진의 셔츠를 헐렁하게 걸친 채 침대 시트 위에서 뺨을 발갛게 물들이고 잠든 무방비한 클로즈업.' }
+      ]
+    },
+    secret: {
+      title: 'Secret',
+      count: '사진 600+ · 동영상 40+',
+      coverBg: 'linear-gradient(135deg, #1b0d14, #59162b)',
+      coverIcon: '🔒',
+      locked: true,
+      items: [
+        { id: 's1', title: '비공개 아카이브 #0412', date: '4월 2일 새벽', art: '🥀', bg: 'linear-gradient(135deg,#1f0d16,#6b1d35)', desc: '하얀 침대 시트 위에서 분홍빛 머리카락을 어지럽게 흩뜨린 채 성유진의 손가락을 입에 물고 눈물 젖은 눈동자로 올려다보는 컷.' },
+        { id: 's2', title: '클로즈업 기록 #0407', date: '4월 7일 밤', art: '💋', bg: 'linear-gradient(135deg,#240c14,#8a1f36)', desc: '뽀얀 허벅지 안쪽과 쇄골 아래로 성유진이 남긴 검붉은 울혈 자국들이 선명하게 찍힌 클로즈업 샷.' },
+        { id: 's3', title: '보복성 촬영본 (도촬 압수 옆 파일)', date: '3월 25일', art: '📸', bg: 'linear-gradient(135deg,#18121c,#4a283d)', desc: '한류아가 장난삼아 성유진의 굴욕 사진을 도촬했다가 빼앗긴 파일 바로 옆에 보복성으로 찍어둔, 잠든 무방비한 모습.' },
+        { id: 's4', title: '고화질 동영상 아카이브 (40+ 클립)', date: '암호화 보관', art: '🎞️', bg: 'linear-gradient(135deg,#111217,#3d1725)', desc: '이중 홍채 암호로 격리 보관 중인 개인 영상 컬렉션.' }
+      ]
+    },
+    work: {
+      title: 'Work',
+      count: '4장',
+      coverBg: 'linear-gradient(135deg, #171920, #383e4c)',
+      coverIcon: '🔥',
+      locked: false,
+      items: [
+        { id: 'w1', title: '구 시네마 콤플렉스 · 괴수 사체 소각 확인', date: '4월 7일', art: '🔥', bg: 'linear-gradient(135deg,#241212,#8a2c24)', desc: '작전 투입 후 9초 만에 완전 소각 처리한 현장 보고용 확인 사진.' },
+        { id: 'w2', title: '제3구역 잔해 소각 완료', date: '3월 28일', art: '📡', bg: 'linear-gradient(135deg,#151b24,#2e3b4e)', desc: '아크 중앙 통제실 제출용 현장 정리 컷.' }
+      ]
+    },
+    screenshots: {
+      title: 'Screenshots',
+      count: '28장',
+      coverBg: 'linear-gradient(135deg, #1b2230, #313b4f)',
+      coverIcon: '📱',
+      locked: false,
+      items: [
+        { id: 'sc1', title: '커뮤니티 찬양 박제 #1', date: '4월 8일', art: '✨', bg: 'linear-gradient(135deg,#1a1f2e,#37415c)', desc: '“역대 에스급 센티넬 중 비주얼 원탑은 역시 신드롬 반박 불가” — 고화질 캡처 보관.' },
+        { id: 'sc2', title: '커뮤니티 찬양 박제 #2', date: '4월 7일', art: '🔥', bg: 'linear-gradient(135deg,#261820,#522737)', desc: '“어제 구 시네마 콤플렉스 괴수 9초 만에 소각하는 영상 봤냐 미친 개섹시함” — 고화질 캡처.' },
+        { id: 'sc3', title: '사내 익명 게시판 박제 & 실명 경고', date: '4월 4일', art: '⚠️', bg: 'linear-gradient(135deg,#291015,#6e1b28)', desc: '원글: “루미너스 요원 요즘 더 예뻐진 듯 혹시 남친 없나?”\n하단 실명 댓글: [유부녀다 눈깔 뽑히기 싫으면 글 내려라 -신드롬]' }
+      ]
+    }
+  };
+
+  const BROWSER_DATA = {
+    history: [
+      { q: '새우 오일 파스타 마늘 안 태우고 볶는 법', time: '2시간 전', tag: '요리' },
+      { q: '20대 초반 여자 생일선물 하이주얼리 한정판', time: '어제', tag: '선물' },
+      { q: '핑크 다이아몬드 세팅 커스텀 기간', time: '어제', tag: '선물' },
+      { q: '숙취에 좋은 황태해장국 레시피', time: '어제', tag: '요리' },
+      { q: '신드롬 레전드 직캠', time: '어제', tag: '자기애' },
+      { q: '여자 허리 근육통 빨리 푸는 마사지 혈자리', time: '그제', tag: '케어' },
+      { q: '딸기 꼭지 안 무르게 씻는 법', time: '그제', tag: '요리' },
+      { q: '성유진 배우 시절 리즈', time: '그제', tag: '자기애' },
+      { q: '아크 신드롬 실물 후기', time: '3일 전', tag: '자기애' },
+      { q: '신드롬 제복 핏', time: '3일 전', tag: '자기애' }
+    ],
+    tabs: [
+      { id: 't1', title: '프랑스 하이엔드 주얼리 하우스 · VVIP 프라이빗 오더', status: '수령 완료', desc: '최상급 핑크 다이아몬드를 메인 스톤으로 세팅한 커스텀 목걸이. 드레스룸 금고 벨벳 상자 보관 중.' },
+      { id: 't2', title: '아크 인근 해안 도시 · 프라이빗 요트 대여 & 불꽃놀이 견적서', status: '예약 검토', desc: '최고급 프라이빗 요트 단독 대절 + 해상 불꽃놀이 연출 VVIP 패키지 견적서.' },
+      { id: 't3', title: '인터넷 지식인: [남동생 군기 잡는 법]', status: '정독함', desc: '고등학생 처남이 누나 생일이라고 기프티콘을 보내며 알짱거리는 것에 대한 진지한 대처법 열람 기록.' },
+      { id: 't4', title: '영화 평점 사이트: 연인과 함께 보기 좋은 달달한 해외 로코 TOP 10', status: '1위 재생 중', desc: '조금 전 거실 소파에서 잠든 한류아를 깨우기 위해 틀어둔 바로 그 영화가 1위에 랭크되어 있음.' }
+    ],
+    bookmarks: [
+      { title: '아크 내부 전술 데이터베이스', url: 'arch.intranet/tactical-db', desc: '뱅가드 2팀장 권한 전용' },
+      { title: '하이엔드 명품 시계 & 주얼리 VVIP 컬렉션', url: 'maison-haute.vvip/private', desc: '신규 한정판 컬렉션 모니터링' }
+    ]
+  };
+
+  const NOTES = [
+    {
+      id: 'n1',
+      title: '한류아 주의사항',
+      pinned: true,
+      locked: false,
+      date: '상시 업데이트',
+      preview: '1. 밥보다 단 거 좋아함. 식사량 적으니까 파인다이닝 데려갈 땐...',
+      items: [
+        '1. 밥보다 단 거 좋아함. 식사량 적으니까 파인다이닝 데려갈 땐 디저트 코스 두 배로 빼달라고 미리 셰프한테 언질 줄 것. 생딸기, 마카롱, 슈크림 붕어빵 환장함.',
+        '2. 추위 잘 탐. 제복 스커트 짧아서 겨울이나 환절기 임무 땐 무조건 내 코트나 담요 챙길 것. 수족냉증 있으니까 잘 때 발 시려워하면 내 다리 사이에 끼워서 데워주기.',
+        '3. 입만 살아서 센 척은 혼자 다 하는데 겁 많음. 공포 영화 절대 금지, 천둥 치거나 괴수 내장 터지는 소리 나면 귀부터 막아줄 것.',
+        '4. 주방 근처 얼씬도 못 하게 할 것. 설거지 시키면 접시 다 깨먹고 손 베임.'
+      ]
+    },
+    {
+      id: 'n2',
+      title: '장부',
+      pinned: false,
+      locked: true,
+      date: '4월 8일 수정',
+      preview: '🔒 암호로 보호된 메모입니다.',
+      items: [
+        '• 4월 1일 연락 두절 및 만취 귀가 사건: 벌칙 총 23회 확정.',
+        '• 4월 2일 새벽: 6회 차감 (잔여 17회) — 허리 아프다고 울어서 봐줌.',
+        '• 4월 7일 밤: 5회 차감 (잔여 12회) — 내일 출근해야 해서 임시 보류.',
+        '• 4월 9일 00시 정각: 남은 12회 전량 회수 예정. 봐주는 거 없음.'
+      ]
+    },
+    {
+      id: 'n3',
+      title: '살생부 (아크 내부 주의 인물)',
+      pinned: false,
+      locked: false,
+      date: '4월 5일 수정',
+      preview: '한류아에게 추파 던지거나 불순한 시선 보낸 요원 목록...',
+      items: [
+        '• [지원부서 신입 요원] 의무실 앞에서 한류아에게 러브레터 전달 → 편지 즉시 소각. 주석: [경고 완료. 한 번만 더 얼씬거리면 훈련장 대련 상대 지목해서 반죽여놓을 것]',
+        '• [익명 게시판 작성자 추적 중] “루미너스 요원 남친 없나?” 게시글 작성자 — 실명 댓글로 경고 완료.',
+        '• [타 팀 센티넬 2명] 복도에서 시선 고정 적발 — 대련 명단 예비 등록.'
+      ]
+    }
+  ];
+
+  const CALENDAR_EVENTS = {
+    '3-13': [{ type: 'pink', title: '류아한테 선물 받은 날', desc: '성유진 본인 생일. 짧게 한 줄만 기록됨.' }],
+    '4-8': [{ type: 'gray', title: '전술 회의', desc: '오후 2시 회의실 (회색 점 표시). 회의 중 한류아와 메시지.' }],
+    '4-9': [
+      { type: 'bday', title: '내 거 생일 ♡ (연차 결재 완료 - 방해하는 새끼 전부 소각)', desc: '자정 00:00 시작 · 핑크 다이아몬드 커스텀 목걸이 전달 & 장부 잔여 12회 정산.' },
+      { type: 'pink', title: '혼인신고 월 기념일 (매달 9일)', desc: '지난해 12월 9일 아크 라운지 서명.' }
+    ],
+    '4-15': [{ type: 'gray', title: '뱅가드 정기 작전 브리핑', desc: '회색 점 표시.' }],
+    '4-18': [{ type: 'cycle', title: '생리 예정일 D-3 케어 알림 시작', desc: '예민함 + 배 아파함. 초콜릿 사두고 핫팩 온도 맞춰서 배 문질러줄 것. 밤일 자제(손이랑 입만 쓰기).' }],
+    '4-19': [{ type: 'cycle', title: '생리 예정일 D-2 · 가이딩 파장 주기 체크', desc: '초콜릿 & 핫팩 온도 상시 유지.' }],
+    '4-20': [{ type: 'cycle', title: '생리 예정일 D-1', desc: '예민함 + 복통 케어. 밤일 자제(손이랑 입만 쓰기).' }],
+    '4-21': [{ type: 'cycle', title: '한류아 생리 예정일 & 가이딩 파장 주기', desc: '하모니 파장 주기 연동 계산 완료.' }]
+  };
+
+  const TRACKS = [
+    { title: 'Almost Blue', artist: 'Chet Baker', genre: 'Jazz Trumpet · FLAC 24bit', plays: 42, duration: '4:31', ryua: false },
+    { title: 'Waltz for Debby', artist: 'Bill Evans Trio', genre: 'Jazz Piano · FLAC 24bit', plays: 38, duration: '6:58', ryua: false },
+    { title: 'My Funny Valentine', artist: 'Chet Baker', genre: 'Jazz Trumpet · FLAC 24bit', plays: 51, duration: '2:19', ryua: false },
+    { title: 'Pink Sparkle (솔로 데뷔곡)', artist: '한류아 (솔로 아이돌 시절)', genre: 'Dance Pop · 무손실 FLAC', plays: 418, duration: '3:14', ryua: true },
+    { title: 'Strawberry Crush', artist: '한류아 (솔로 아이돌 시절)', genre: 'Dance Pop · 무손실 FLAC', plays: 362, duration: '3:08', ryua: true },
+    { title: 'Luminous Night (은퇴 직전 미니앨범)', artist: '한류아 (솔로 아이돌 시절)', genre: 'Dance Pop · 무손실 FLAC', plays: 509, duration: '3:26', ryua: true }
+  ];
+
+  const CART_ITEMS = [
+    { id: 'ct1', owner: 'me', name: '수제 테일러 샵 블랙 가죽 장갑 (여분 2켤레)', brand: '단골 비스포크 테일러', note: '본인용' },
+    { id: 'ct2', owner: 'me', name: '샌달우드 계열 니치 퍼퓸 리필 보틀', brand: 'Maison Sandalwood', note: '본인용' },
+    { id: 'ct3', owner: 'ryua', name: '캐시미어 100% 롱 담요 (임무 이동용)', brand: 'Loro VVIP', note: '한류아 추위 대비' },
+    { id: 'ct4', owner: 'ryua', name: '프리미엄 킹스베리 생딸기 기프트 박스', brand: 'VIP 청과 컨시어지', note: '생딸기 환장함' },
+    { id: 'ct5', owner: 'ryua', name: '수제 마카롱 부티크 스페셜 어소트먼트', brand: 'Boutique Macaron', note: '단 거 선호' },
+    { id: 'ct6', owner: 'ryua', name: '실크 100% 핑크 리본 파자마 세트', brand: 'La Perla VVIP', note: '수면용' },
+    { id: 'ct7', owner: 'ryua', name: '수족냉증 전용 캐시미어 룸삭스 3종', brand: 'Loro VVIP', note: '발 시려움 방지' },
+    { id: 'ct8', owner: 'ryua', name: '벨기에 수제 다크·밀크 초콜릿 세트', brand: 'Chocolatier Royal', note: '생리 전 케어 대비' },
+    { id: 'ct9', owner: 'ryua', name: '충전식 프리미엄 온열 핫팩 워머', brand: 'Concierge Care', note: '배 문질러줄 때 사용' },
+    { id: 'ct10', owner: 'ryua', name: '하이엔드 미니 핑크 숄더백 (한정판)', brand: 'Paris VVIP', note: '생일 서브 선물' },
+    { id: 'ct11', owner: 'ryua', name: '벨벳 커스텀 주얼리 케이스', brand: 'Maison Haute', note: '핑크 다이아 목걸이 보관' },
+    { id: 'ct12', owner: 'ryua', name: '로제 빈티지 샴페인 (도수 낮은 스위트)', brand: 'Private Cellar', note: '생일 저녁용' },
+    { id: 'ct13', owner: 'ryua', name: '고양이 실루엣 핑크 리본 헤어핀', brand: 'Atelier Rose', note: '취향 저격' },
+    { id: 'ct14', owner: 'ryua', name: '미쉐린 파티시에 생딸기 홀케이크 예약', brand: 'Patisserie Noir', note: '4월 9일 픽업' }
+  ];
+
+  /* ================= CORE HELPERS ================= */
+  const $ = (id) => document.getElementById(id);
+
+  let toastTimer = null;
+  function showToast(msg) {
+    try {
+      const el = $('toast');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+    } catch (err) { /* safe */ }
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  /* ================= UNIFIED SCREEN NAVIGATION ================= */
+  function syncActiveScreen() {
+    const currentId = state.screenStack[state.screenStack.length - 1] || 'home';
+    document.querySelectorAll('.screen').forEach((sec) => {
+      if (sec.dataset.screen === currentId) {
+        sec.classList.add('active');
+      } else {
+        sec.classList.remove('active');
+      }
+    });
+  }
+
+  function closeFolderModal() {
+    const bd = $('folderBackdrop');
+    if (bd) {
+      bd.classList.remove('open');
+      bd.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  function closeAuthModal() {
+    const bd = $('authBackdrop');
+    if (bd) {
+      bd.classList.remove('open');
+      bd.setAttribute('aria-hidden', 'true');
+    }
+    state.pendingAuthTarget = null;
+  }
+
+  function openScreen(screenId, payload) {
+    closeFolderModal();
+    closeAuthModal();
+
+    if (screenId === 'phone') renderPhone();
+    else if (screenId === 'messenger') renderMessenger();
+    else if (screenId === 'chatroom') renderChatRoom(payload);
+    else if (screenId === 'gallery') renderGallery();
+    else if (screenId === 'gallery-detail') renderGalleryDetail(payload);
+    else if (screenId === 'browser') renderBrowser();
+    else if (screenId === 'notes') renderNotes();
+    else if (screenId === 'note-detail') renderNoteDetail(payload);
+    else if (screenId === 'calendar') renderCalendar();
+    else if (screenId === 'clock') renderClock();
+    else if (screenId === 'audio') renderAudio();
+    else if (screenId === 'shopping') renderShopping();
+    else if (screenId === 'utility') renderUtility(payload);
+
+    const top = state.screenStack[state.screenStack.length - 1];
+    if (top !== screenId) {
+      state.screenStack.push(screenId);
+    }
+    syncActiveScreen();
+  }
+
+  function goBack() {
+    const folderOpen = $('folderBackdrop') && $('folderBackdrop').classList.contains('open');
+    if (folderOpen) { closeFolderModal(); return; }
+    const authOpen = $('authBackdrop') && $('authBackdrop').classList.contains('open');
+    if (authOpen) { closeAuthModal(); return; }
+    const callOpen = $('callOverlay') && $('callOverlay').classList.contains('open');
+    if (callOpen) { closeCallOverlay(); return; }
+
+    if (state.screenStack.length > 1) {
+      const top = state.screenStack[state.screenStack.length - 1];
+      if (top === 'home') {
+        showToast('홈 화면입니다. 잠그려면 우측 잠금 버튼을 누르세요.');
+        return;
+      }
+      state.screenStack.pop();
+      syncActiveScreen();
+    } else if (state.screenStack[0] === 'lock') {
+      showToast('홍채 인식으로 잠금을 해제해 주세요.');
+    }
+  }
+
+  function goHome() {
+    closeFolderModal();
+    closeAuthModal();
+    closeCallOverlay();
+    if (state.screenStack[state.screenStack.length - 1] === 'lock') {
+      showToast('먼저 생체 홍채 인식으로 잠금을 해제해 주세요.');
+      return;
+    }
+    state.screenStack = ['home'];
+    syncActiveScreen();
+  }
+
+  function lockDevice() {
+    closeFolderModal();
+    closeAuthModal();
+    closeCallOverlay();
+    state.screenStack = ['lock'];
+    syncActiveScreen();
+    showToast('ARCH-Terminal Pro 화면이 잠겼습니다.');
+  }
+
+  function switchHomePage(pageNum) {
+    state.homePage = pageNum;
+    const p1 = $('homePage1');
+    const p2 = $('homePage2');
+    if (p1 && p2) {
+      p1.classList.toggle('active', pageNum === 1);
+      p2.classList.toggle('active', pageNum === 2);
+    }
+    document.querySelectorAll('[data-switch-page]').forEach((btn) => {
+      const num = Number(btn.dataset.switchPage);
+      btn.classList.toggle('active', num === pageNum);
+      btn.textContent = num === 1 ? (num === pageNum ? '● 홈 1' : '○ 홈 1') : (num === pageNum ? '● 폴더 (2)' : '○ 폴더 (2)');
+    });
+  }
+
+  function launchAppById(appId) {
+    const directScreens = ['phone', 'messenger', 'camera', 'gallery', 'browser', 'notes', 'calendar', 'clock', 'audio', 'shopping'];
+    if (directScreens.includes(appId)) {
+      openScreen(appId);
+    } else {
+      openScreen('utility', appId);
+    }
+  }
+
+  /* ================= FOLDER MODAL ================= */
+  function openFolder(folderKey) {
+    const data = FOLDERS[folderKey];
+    if (!data) return;
+    $('folderModalTitle').textContent = data.title;
+    $('folderAppsGrid').innerHTML = data.apps.map((app) => `
+      <button class="folder-app-tile tap-scale" data-launch-app="${app.id}">
+        <span class="tile-ico">${app.icon}</span>
+        <span class="tile-name">${escapeHtml(app.name)}</span>
+        <span class="tile-sub">${escapeHtml(app.sub)}</span>
+      </button>
+    `).join('');
+    const bd = $('folderBackdrop');
+    bd.classList.add('open');
+    bd.setAttribute('aria-hidden', 'false');
+  }
+
+  /* ================= BIOMETRIC AUTH MODAL ================= */
+  function openAuthModal(targetType, title, desc) {
+    state.pendingAuthTarget = targetType;
+    $('authTitle').textContent = title;
+    $('authDesc').textContent = desc;
+    const bd = $('authBackdrop');
+    bd.classList.add('open');
+    bd.setAttribute('aria-hidden', 'false');
+  }
+
+  /* ================= CALL OVERLAY ================= */
+  function openCallOverlay(name, avatar) {
+    $('callTargetName').textContent = name;
+    $('callTargetAvatar').textContent = avatar || '📞';
+    $('callStatusText').textContent = name === '내 거 ♡' ? '전용 직통 회선 연결 중...' : 'ARCH 보안 회선 발신 중...';
+    $('callOverlay').classList.add('open');
+  }
+  function closeCallOverlay() {
+    $('callOverlay').classList.remove('open');
+  }
+
+  /* ================= RENDER: PHONE ================= */
+  function renderPhone() {
+    const body = $('phoneBody');
+    const isRecent = state.phoneTab === 'recent';
+
+    let html = `
+      <div class="seg-tabs">
+        <button class="seg-tab ${isRecent ? 'active' : ''}" data-phone-tab="recent">최근 통화</button>
+        <button class="seg-tab ${!isRecent ? 'active' : ''}" data-phone-tab="contacts">주요 연락처</button>
+      </div>
+    `;
+
+    if (isRecent) {
+      html += CALL_LOGS.map((c) => `
+        <button class="list-item tap-scale" data-call-id="${c.id}">
+          <div class="avatar ${c.cls}">${c.avatar}</div>
+          <div class="item-main">
+            <div class="item-top">
+              <span class="item-title" style="${c.name === '내 거 ♡' ? 'color:var(--pink);' : ''}">${escapeHtml(c.name)}</span>
+              <span class="item-time">${escapeHtml(c.time)}</span>
+            </div>
+            <div class="item-sub">${escapeHtml(c.type)} · ${escapeHtml(c.duration)}</div>
+          </div>
+          <span style="font-size:16px;color:var(--emerald);">📞</span>
+        </button>
+      `).join('');
+    } else {
+      const contacts = [
+        { name: '내 거 ♡', avatar: '🐱', cls: 'ryua', role: '법적 배우자 · 공식 가이드 (직통 알림 허용)', note: '원래 "한류아"였으나 혼인신고 직후 강제로 하트까지 추가됨.' },
+        { name: '부산 장모님', avatar: '🌸', cls: 'family', role: '처가 어른 · 깍듯한 응대', note: '최근 수신 21분 10초.' },
+        { name: '여우 새끼(카이날루)', avatar: '🦊', cls: 'crimson', role: '뱅가드 2팀원', note: '대부분 수신 거절 또는 8~12초 컷.' },
+        { name: '중2병(바이브)', avatar: '⚡', cls: '', role: '뱅가드 2팀원', note: '이틀 전 발신 45초.' },
+        { name: '시베리아 곰탱이(리암)', avatar: '🐻', cls: '', role: '뱅가드 2팀원', note: '부재중 2통 콜백 안 함.' }
+      ];
+      html += contacts.map((ct) => `
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+            <div class="avatar ${ct.cls}">${ct.avatar}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:14px;font-weight:700;">${escapeHtml(ct.name)}</div>
+              <div style="font-size:11px;color:var(--text-3);">${escapeHtml(ct.role)}</div>
+            </div>
+            <button class="tap-scale" data-dial-name="${escapeHtml(ct.name)}" data-dial-avatar="${ct.avatar}" style="min-width:44px;min-height:44px;border-radius:12px;border:1px solid rgba(52,211,153,0.3);background:rgba(52,211,153,0.14);color:var(--emerald);font-size:16px;">📞</button>
+          </div>
+          <div style="font-size:11.5px;color:var(--text-2);line-height:1.45;">${escapeHtml(ct.note)}</div>
+        </div>
+      `).join('');
+    }
+    body.innerHTML = html;
+  }
+
+  /* ================= RENDER: MESSENGER ================= */
+  function renderMessenger() {
+    const body = $('messengerBody');
+    let html = `
+      <div class="card" style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+        <div class="avatar yujin"></div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13.5px;font-weight:700;">성유진 <span class="badge-pill" style="margin-left:4px;">기본 프로필</span></div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:2px;">프로필 사진: 단색 블랙 · 상태 메시지: 공란</div>
+          <div style="font-size:11px;color:#ff7b89;margin-top:4px;">팀 단체방 멀티 프로필: <strong>[건드리면 죽인다]</strong></div>
+        </div>
+      </div>
+    `;
+
+    html += CHATS.map((ch) => `
+      <button class="list-item tap-scale" data-chat-id="${ch.id}" style="${ch.pinned ? 'border-color:rgba(244,151,182,0.35);' : ''}">
+        <div class="avatar ${ch.cls}">${ch.avatar}</div>
+        <div class="item-main">
+          <div class="item-top">
+            <span class="item-title">
+              ${ch.pinned ? '📌 ' : ''}${escapeHtml(ch.name)} ${ch.muted ? '<span style="font-size:11px;color:var(--text-3);">🔕</span>' : ''}
+            </span>
+            <span class="item-time">${escapeHtml(ch.time)}</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <span class="item-sub">${escapeHtml(ch.preview)}</span>
+            ${ch.unread > 0 ? `<span class="badge-red">${ch.unread}</span>` : ''}
+          </div>
+        </div>
+      </button>
+    `).join('');
+
+    body.innerHTML = html;
+  }
+
+  /* ================= RENDER: CHAT ROOM ================= */
+  function renderChatRoom(chatId) {
+    const chat = CHATS.find((c) => c.id === chatId);
+    if (!chat) return;
+    $('chatRoomTitle').textContent = chat.name;
+    $('chatRoomSub').textContent = chat.sub;
+    const body = $('chatRoomBody');
+    body.className = 'chat-body' + (chat.theme === 'sakura' ? ' sakura-theme' : '');
+
+    body.innerHTML = chat.messages.map((m, idx) => {
+      if (m.type === 'divider') {
+        return `<div class="chat-date-divider">${escapeHtml(m.text)}</div>`;
+      }
+      if (m.sticker) {
+        return `
+          <div class="msg-row ${m.sender}">
+            <div class="sticker-card">
+              <span class="sticker-emoji">${m.emoji}</span>
+              <span>${escapeHtml(m.label)}</span>
+            </div>
+            <span class="msg-time">${escapeHtml(m.time)}</span>
+          </div>
+        `;
+      }
+      if (m.voice) {
+        return `
+          <div class="msg-row ${m.sender}">
+            <button class="voice-msg-btn tap-scale" data-voice-idx="${idx}">
+              <div class="voice-row">
+                <span class="voice-play-ico">▶</span>
+                <div class="voice-bars">
+                  <span class="voice-bar" style="height:8px"></span>
+                  <span class="voice-bar" style="height:15px"></span>
+                  <span class="voice-bar" style="height:11px"></span>
+                  <span class="voice-bar" style="height:17px"></span>
+                  <span class="voice-bar" style="height:9px"></span>
+                  <span class="voice-bar" style="height:14px"></span>
+                  <span class="voice-bar" style="height:10px"></span>
+                </div>
+                <span style="font-size:11px;color:var(--pink);font-weight:600;">${escapeHtml(m.duration)} · 재생 완료</span>
+              </div>
+              <div class="voice-transcript">${escapeHtml(m.transcript)}</div>
+            </button>
+            <span class="msg-time">${escapeHtml(m.time)}</span>
+          </div>
+        `;
+      }
+      return `
+        <div class="msg-row ${m.sender}">
+          <div>
+            ${m.sender === 'other' && m.name ? `<div class="msg-sender">${escapeHtml(m.name)}</div>` : ''}
+            <div class="msg-bubble">${escapeHtml(m.text).replace(/\n/g, '<br>')}</div>
+          </div>
+          <span class="msg-time">${escapeHtml(m.time)}</span>
+        </div>
+      `;
+    }).join('');
+    body.scrollTop = body.scrollHeight;
+  }
+
+  /* ================= RENDER: GALLERY ================= */
+  function renderGallery() {
+    const body = $('galleryBody');
+    const t = state.galleryTab;
+    let html = `
+      <div class="seg-tabs">
+        <button class="seg-tab ${t === 'albums' ? 'active' : ''}" data-gal-tab="albums">앨범 (4)</button>
+        <button class="seg-tab ${t === 'favorites' ? 'active' : ''}" data-gal-tab="favorites">즐겨찾기 ♥</button>
+        <button class="seg-tab ${t === 'trash' ? 'active' : ''}" data-gal-tab="trash">휴지통</button>
+      </div>
+    `;
+
+    if (t === 'albums') {
+      html += `<div class="album-grid">`;
+      Object.entries(GALLERY_ALBUMS).forEach(([key, al]) => {
+        const isLocked = al.locked && !state.secretUnlocked;
+        html += `
+          <button class="album-card tap-scale" data-album-key="${key}">
+            <div class="album-cover" style="background:${al.coverBg};">
+              <span>${isLocked ? '🔒' : al.coverIcon}</span>
+            </div>
+            <div class="album-info">
+              <div class="album-title">${escapeHtml(al.title)} ${isLocked ? '(홍채 잠금)' : ''}</div>
+              <div class="album-count">${escapeHtml(al.count)}</div>
+            </div>
+          </button>
+        `;
+      });
+      html += `</div>
+        <div class="card" style="margin-top:12px;">
+          <div style="font-size:12px;color:var(--text-2);line-height:1.5;">
+            전체 <strong>3,842장</strong> 중 90% 이상이 한류아의 사진과 영상으로 채워져 있으며, 성유진 본인의 셀카는 단 한 장도 존재하지 않습니다.
+          </div>
+        </div>`;
+    } else if (t === 'favorites') {
+      html += `
+        <button class="card pink-tint tap-scale" data-fav-doc="marriage" style="width:100%;text-align:left;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="badge-pill pink">♥ 즐겨찾기 최상단 고정</span>
+            <span style="font-size:11px;color:var(--text-3);">지난해 12월 9일</span>
+          </div>
+          <div style="font-size:15px;font-weight:700;margin-bottom:6px;">📜 혼인신고서 원본</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.5;">
+            아크 라운지에서 한류아의 서명을 받아낸 직후, 자신의 검은 제복 재킷 안주머니 심장 위에 넣기 전에 촬영해 둔 원본 문서 사진.
+          </div>
+          <div style="margin-top:10px;padding:10px;border-radius:12px;background:rgba(0,0,0,0.35);font-size:11.5px;color:#ffdbe8;border:1px dashed rgba(244,151,182,0.35);">
+            남편: 성유진 (S급 센티넬 · 신드롬)<br>
+            아내: 한류아 (가이드 · 루미너스)<br>
+            서명일: 12월 9일 · 아크 라운지
+          </div>
+        </button>
+      `;
+    } else {
+      html += `
+        <div class="card" style="text-align:center;padding:34px 16px;">
+          <div style="font-size:34px;margin-bottom:10px;">🗑️</div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:6px;">휴지통이 비어 있습니다</div>
+          <div style="font-size:12px;color:var(--text-3);">완벽주의자답게 불필요한 항목 하나 남기지 않고 깨끗하게 정리됨.</div>
+        </div>
+      `;
+    }
+
+    body.innerHTML = html;
+  }
+
+  function renderGalleryDetail(albumKey) {
+    const al = GALLERY_ALBUMS[albumKey];
+    if (!al) return;
+    $('galleryDetailTitle').textContent = `[${al.title}]`;
+    $('galleryDetailSub').textContent = al.count;
+    const body = $('galleryDetailBody');
+
+    body.innerHTML = `
+      <div class="photo-grid">
+        ${al.items.map((item) => `
+          <button class="photo-thumb tap-scale" data-photo-album="${albumKey}" data-photo-id="${item.id}">
+            <div class="photo-art" style="background:${item.bg};">${item.art}</div>
+            <div class="photo-cap">
+              <div style="font-weight:700;color:var(--text-1);margin-bottom:2px;">${escapeHtml(item.title)}</div>
+              <div style="font-size:10px;color:var(--text-3);">${escapeHtml(item.date)}</div>
+            </div>
+          </button>
+        `).join('')}
+      </div>
+      <div id="photoPreviewBox" style="margin-top:12px;"></div>
+    `;
+  }
+
+  /* ================= RENDER: BROWSER ================= */
+  function renderBrowser() {
+    const body = $('browserBody');
+    const t = state.browserTab;
+    let html = `
+      <div class="seg-tabs">
+        <button class="seg-tab ${t === 'history' ? 'active' : ''}" data-br-tab="history">검색 기록</button>
+        <button class="seg-tab ${t === 'tabs' ? 'active' : ''}" data-br-tab="tabs">열린 탭 (4)</button>
+        <button class="seg-tab ${t === 'bookmarks' ? 'active' : ''}" data-br-tab="bookmarks">북마크</button>
+      </div>
+    `;
+
+    if (t === 'history') {
+      html += BROWSER_DATA.history.map((h) => `
+        <button class="list-item tap-scale" data-search-q="${escapeHtml(h.q)}">
+          <div class="avatar" style="width:38px;height:38px;font-size:15px;">🔍</div>
+          <div class="item-main">
+            <div class="item-title" style="white-space:normal;line-height:1.35;">${escapeHtml(h.q)}</div>
+            <div class="item-sub" style="margin-top:3px;">${escapeHtml(h.time)} · <span class="badge-pill ${h.tag === '자기애' ? 'crimson' : 'pink'}">${escapeHtml(h.tag)}</span></div>
+          </div>
+        </button>
+      `).join('');
+    } else if (t === 'tabs') {
+      html += BROWSER_DATA.tabs.map((tb, i) => `
+        <div class="card ${i === 0 ? 'pink-tint' : ''}">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <span class="badge-pill ${i === 0 ? 'emerald' : ''}">탭 #${i + 1} · ${escapeHtml(tb.status)}</span>
+          </div>
+          <div style="font-size:13.5px;font-weight:700;margin-bottom:5px;line-height:1.4;">${escapeHtml(tb.title)}</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.5;">${escapeHtml(tb.desc)}</div>
+        </div>
+      `).join('');
+    } else {
+      html += BROWSER_DATA.bookmarks.map((bm) => `
+        <button class="list-item tap-scale" data-search-q="${escapeHtml(bm.title)}">
+          <div class="avatar" style="width:40px;height:40px;">⭐</div>
+          <div class="item-main">
+            <div class="item-title">${escapeHtml(bm.title)}</div>
+            <div class="item-sub">${escapeHtml(bm.url)} · ${escapeHtml(bm.desc)}</div>
+          </div>
+        </button>
+      `).join('');
+    }
+
+    body.innerHTML = html;
+  }
+
+  /* ================= RENDER: NOTES ================= */
+  function renderNotes() {
+    const body = $('notesBody');
+    body.innerHTML = NOTES.map((n) => {
+      const locked = n.locked && !state.ledgerUnlocked;
+      return `
+        <button class="list-item tap-scale" data-note-id="${n.id}" style="${n.pinned ? 'border-color:rgba(234,179,8,0.4);' : ''}">
+          <div class="avatar" style="${n.pinned ? 'background:rgba(234,179,8,0.18);color:var(--gold);' : locked ? 'background:var(--crimson-soft);color:#ff7b89;' : ''}">
+            ${n.pinned ? '📌' : locked ? '🔒' : '📝'}
+          </div>
+          <div class="item-main">
+            <div class="item-top">
+              <span class="item-title">${escapeHtml(n.title)}</span>
+              <span class="item-time">${escapeHtml(n.date)}</span>
+            </div>
+            <div class="item-sub">${escapeHtml(locked ? '🔒 암호 잠금 해제 필요' : n.preview)}</div>
+          </div>
+        </button>
+      `;
+    }).join('');
+  }
+
+  function renderNoteDetail(noteId) {
+    const note = NOTES.find((n) => n.id === noteId);
+    if (!note) return;
+    $('noteDetailTitle').textContent = note.title;
+    $('noteDetailSub').textContent = note.date;
+    $('noteDetailBody').innerHTML = `
+      <div class="card ${note.id === 'n1' ? 'pink-tint' : note.id === 'n2' ? 'crimson-tint' : ''}">
+        ${note.items.map((line) => `
+          <div style="font-size:13px;line-height:1.65;color:var(--text-1);padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07);">
+            ${escapeHtml(line)}
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  /* ================= RENDER: CALENDAR ================= */
+  function renderCalendar() {
+    const body = $('calendarBody');
+    const m = state.calMonth;
+    const daysInMonth = m === 3 ? 31 : 30;
+    const startOffset = m === 3 ? 0 : 3; // 2026-style clean grid
+
+    let gridHtml = ['일','월','화','수','목','금','토'].map((d) => `<div class="cal-dow">${d}</div>`).join('');
+    for (let i = 0; i < startOffset; i++) {
+      gridHtml += `<div class="cal-cell empty"></div>`;
+    }
+    for (let d = 1; d <= daysInMonth; d++) {
+      const key = `${m}-${d}`;
+      const evs = CALENDAR_EVENTS[key] || [];
+      const isBday = key === '4-9';
+      const isCycle = m === 4 && d >= 18 && d <= 21;
+      const isSel = d === state.calSelectedDay;
+      let dots = '';
+      if (isBday) dots = `<span class="cal-star">★</span>`;
+      else if (evs.some((e) => e.type === 'pink' || e.type === 'cycle')) dots = `<span class="cal-dot-pink"></span>`;
+      else if (evs.some((e) => e.type === 'gray')) dots = `<span class="cal-dot-gray"></span>`;
+
+      gridHtml += `
+        <button class="cal-cell tap-scale ${isBday ? 'bday' : ''} ${isCycle ? 'cycle-shade' : ''} ${isSel ? 'selected' : ''}" data-cal-day="${d}">
+          <span>${d}</span>
+          <span class="cal-dots">${dots}</span>
+        </button>
+      `;
+    }
+
+    const selKey = `${m}-${state.calSelectedDay}`;
+    const selEvents = CALENDAR_EVENTS[selKey] || [];
+
+    body.innerHTML = `
+      <div class="cal-header-row">
+        <button class="cal-month-btn tap-scale" data-cal-month="${m === 4 ? 3 : 4}">◀ ${m === 4 ? '3월' : '4월'}</button>
+        <div style="font-size:16px;font-weight:700;">${m}월</div>
+        <button class="cal-month-btn tap-scale" data-cal-month="${m === 3 ? 4 : 3}">${m === 3 ? '4월' : '3월'} ▶</button>
+      </div>
+      <div class="cal-grid">${gridHtml}</div>
+      <div style="font-size:11.5px;color:var(--text-3);margin-bottom:8px;">${m}월 ${state.calSelectedDay}일 일정</div>
+      ${selEvents.length ? selEvents.map((ev) => `
+        <div class="card ${ev.type === 'bday' ? 'crimson-tint' : ev.type === 'cycle' || ev.type === 'pink' ? 'pink-tint' : ''}">
+          <div style="font-size:13.5px;font-weight:700;color:${ev.type === 'bday' ? '#ff5c72' : ev.type === 'cycle' || ev.type === 'pink' ? 'var(--pink)' : 'var(--text-1)'};margin-bottom:4px;">
+            ${escapeHtml(ev.title)}
+          </div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.5;">${escapeHtml(ev.desc)}</div>
+        </div>
+      `).join('') : `<div class="card" style="font-size:12px;color:var(--text-3);">등록된 주요 일정이 없습니다.</div>`}
+    `;
+  }
+
+  /* ================= RENDER: CLOCK / ALARMS ================= */
+  function renderClock() {
+    const body = $('clockBody');
+    body.innerHTML = `
+      <div class="card pink-tint" style="margin-bottom:14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:12px;font-weight:700;color:var(--pink);">🔊 지정된 커스텀 알람음</span>
+          <button class="tap-scale" id="playAlarmVoiceBtn" style="min-height:36px;padding:4px 12px;border-radius:99px;border:1px solid rgba(244,151,182,0.4);background:rgba(244,151,182,0.18);color:var(--pink);font-size:11.5px;font-weight:700;">▶ 미리 듣기</button>
+        </div>
+        <div style="font-size:12.5px;color:var(--text-1);line-height:1.45;">“야 성유진! 빨리 안 일어나?!”</div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:3px;">과거 한류아가 성유진의 단말기에 몰래 녹음해 둔 앙칼진 목소리 파일</div>
+      </div>
+
+      ${state.alarms.map((al) => `
+        <div class="alarm-card">
+          <div style="min-width:0;flex:1;">
+            <div style="display:flex;align-items:baseline;gap:6px;">
+              <span style="font-size:11px;color:var(--text-3);">${escapeHtml(al.period)}</span>
+              <span class="alarm-time">${escapeHtml(al.time)}</span>
+            </div>
+            <div class="alarm-label">${escapeHtml(al.label)}</div>
+            <div class="alarm-meta">${escapeHtml(al.mode)}</div>
+          </div>
+          <button class="toggle-switch ${al.on ? 'on' : ''}" data-alarm-toggle="${al.id}" aria-label="${escapeHtml(al.label)} 토글">
+            <span class="toggle-track"><span class="toggle-knob"></span></span>
+          </button>
+        </div>
+      `).join('')}
+    `;
+  }
+
+  /* ================= RENDER: AUDIO PLAYER ================= */
+  function renderAudio() {
+    const body = $('audioBody');
+    const cur = TRACKS[state.activeAudioIdx] || TRACKS[0];
+
+    body.innerHTML = `
+      <div class="player-hero">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span class="badge-pill ${cur.ryua ? 'pink' : ''}">${cur.ryua ? '♥ 무손실 소장 음원' : 'HI-FI LOSSLESS'}</span>
+          <span style="font-size:11px;color:var(--text-3);">누적 재생 ${cur.plays}회</span>
+        </div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:3px;">${escapeHtml(cur.title)}</div>
+        <div style="font-size:12px;color:var(--text-2);">${escapeHtml(cur.artist)} · ${escapeHtml(cur.genre)}</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="audioProgressFill" style="width:${state.audioProgress}%;"></div></div>
+        <div class="player-controls">
+          <button class="player-btn tap-scale" data-audio-ctrl="prev" aria-label="이전 곡">⏮</button>
+          <button class="player-btn primary tap-scale" data-audio-ctrl="toggle" aria-label="재생 또는 일시정지">${state.isAudioPlaying ? '⏸' : '▶'}</button>
+          <button class="player-btn tap-scale" data-audio-ctrl="next" aria-label="다음 곡">⏭</button>
+        </div>
+      </div>
+
+      <div style="font-size:11.5px;color:var(--text-3);margin:0 0 8px 2px;">최근 재생 목록 (혼자 샤워·이동 중 이어폰 감상)</div>
+      ${TRACKS.map((tr, i) => `
+        <button class="list-item tap-scale" data-track-idx="${i}" style="${i === state.activeAudioIdx ? 'border-color:rgba(244,151,182,0.45);background:rgba(244,151,182,0.08);' : ''}">
+          <div class="avatar ${tr.ryua ? 'ryua' : ''}" style="width:40px;height:40px;font-size:16px;">${tr.ryua ? '🎤' : '🎺'}</div>
+          <div class="item-main">
+            <div class="item-top">
+              <span class="item-title">${escapeHtml(tr.title)}</span>
+              <span class="item-time">${escapeHtml(tr.duration)}</span>
+            </div>
+            <div class="item-sub">${escapeHtml(tr.artist)} · <strong>${tr.plays}회</strong> 재생</div>
+          </div>
+        </button>
+      `).join('')}
+    `;
+  }
+
+  function startAudioLoop() {
+    if (state.audioTimer) clearInterval(state.audioTimer);
+    if (!state.isAudioPlaying) return;
+    state.audioTimer = setInterval(() => {
+      state.audioProgress = (state.audioProgress + 3) % 100;
+      const bar = $('audioProgressFill');
+      if (bar) bar.style.width = state.audioProgress + '%';
+    }, 500);
+  }
+
+  /* ================= RENDER: SHOPPING CART ================= */
+  function renderShopping() {
+    const body = $('shoppingBody');
+    const f = state.shoppingFilter;
+    const list = CART_ITEMS.filter((it) => f === 'all' || it.owner === f);
+
+    body.innerHTML = `
+      <div class="seg-tabs">
+        <button class="seg-tab ${f === 'all' ? 'active' : ''}" data-shop-filter="all">전체 (14)</button>
+        <button class="seg-tab ${f === 'ryua' ? 'active' : ''}" data-shop-filter="ryua">한류아 (12)</button>
+        <button class="seg-tab ${f === 'me' ? 'active' : ''}" data-shop-filter="me">본인 (2)</button>
+      </div>
+      ${list.map((it) => {
+        const checked = !!state.checkedCartIds[it.id];
+        return `
+          <button class="list-item tap-scale" data-cart-toggle="${it.id}" style="${checked ? 'opacity:0.62;' : ''}">
+            <div class="avatar ${it.owner === 'ryua' ? 'ryua' : ''}" style="width:38px;height:38px;font-size:15px;">
+              ${checked ? '✓' : it.owner === 'ryua' ? '🎁' : '🖤'}
+            </div>
+            <div class="item-main">
+              <div class="item-title" style="white-space:normal;line-height:1.35;${checked ? 'text-decoration:line-through;' : ''}">${escapeHtml(it.name)}</div>
+              <div class="item-sub" style="margin-top:2px;">${escapeHtml(it.brand)} · <span style="color:${it.owner === 'ryua' ? 'var(--pink)' : 'var(--text-3)'};">${escapeHtml(it.note)}</span></div>
+            </div>
+          </button>
+        `;
+      }).join('')}
+    `;
+  }
+
+  /* ================= RENDER: UTILITY / FOLDER APPS ================= */
+  function renderUtility(appId) {
+    const titleEl = $('utilityTitle');
+    const subEl = $('utilitySub');
+    const body = $('utilityBody');
+
+    const views = {
+      'vital': {
+        title: '파트너 파장 공명 모니터',
+        sub: '하모니 부서 연동 · 센티넬 자가 진단',
+        html: `
+          <div class="card pink-tint">
+            <div style="font-size:12px;color:var(--pink);font-weight:700;margin-bottom:6px;">● 실시간 동조 상태: 최상</div>
+            <div style="font-size:20px;font-weight:700;margin-bottom:4px;">공명률 98.4%</div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.5;">성유진(S급 센티넬 · 신드롬) ↔ 한류아(공식 파트너 · 루미너스)<br>현재 거리: 근거리 (자택 거실) · 심박수 72 BPM · 폭주 위험도 0.0%</div>
+          </div>
+          <div class="card">
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px;">센티넬 파장 자가 진단</div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.55;">• 열에너지 출력 안정성: 정상 (섭씨 1,000°C 이상 제어 가능)<br>• 정서적 불안정 수치: 매우 낮음 (배우자 동거 효과)</div>
+          </div>
+        `
+      },
+      'arch-net': {
+        title: '아크 넷 (ARCH-Net)',
+        sub: '기관 내부 보안 인트라넷',
+        html: `
+          <div class="card crimson-tint">
+            <div class="badge-pill crimson" style="margin-bottom:6px;">CODE RED 경보 전용</div>
+            <div style="font-size:14px;font-weight:700;margin-bottom:4px;">현재 발령된 긴급 출동 경보 없음</div>
+            <div style="font-size:12px;color:var(--text-2);">일반 부서 공지 알림은 전부 차단되어 있습니다.</div>
+          </div>
+          <div class="card">
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px;">최근 작전 기록</div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.5;">• 구 시네마 콤플렉스 괴수 소각 작전 — 완료 (9초)<br>• 4월 9일 개인 연차 결재 — 최종 승인 완료</div>
+          </div>
+        `
+      },
+      'arch-terrain': {
+        title: '작전 구역 지형 분석기',
+        sub: 'ARCH Tactical Topo Scanner',
+        html: `
+          <div class="card">
+            <div style="height:150px;border-radius:12px;background:repeating-linear-gradient(0deg, rgba(56,189,248,0.08) 0 1px, transparent 1px 22px), repeating-linear-gradient(90deg, rgba(56,189,248,0.08) 0 1px, transparent 1px 22px), #0c131c;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;margin-bottom:10px;">
+              <span style="color:var(--cyan);font-size:12px;font-weight:700;">구 시네마 콤플렉스 · 반경 400m</span>
+              <span class="badge-pill emerald">위협 잔존율 0% · 소각 완료</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.5;">고열 화력 전개 시 인근 민간 피해 차단 경로 시뮬레이션 저장됨.</div>
+          </div>
+        `
+      },
+      'arch-guide': {
+        title: '가이딩 예약 시스템',
+        sub: '하모니 부서 전용 · 내규상 삭제 불가',
+        html: `
+          <div class="card" style="text-align:center;padding:30px 16px;">
+            <div style="font-size:34px;margin-bottom:10px;">📋</div>
+            <div style="font-size:14.5px;font-weight:700;margin-bottom:6px;">실행 기록 없음</div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.55;">공식 파트너이자 법적 배우자인 한류아와 동거 중이므로 예약 이력이 단 한 건도 존재하지 않습니다.<br><span style="color:var(--text-3);">(기관 내규상 앱 삭제 불가)</span></div>
+          </div>
+        `
+      },
+      'sns-insta': {
+        title: '인스타그램 (비공개 가계정)',
+        sub: '@syj_private_00 · 서치 전용',
+        html: `
+          <div class="card">
+            <div style="font-size:12px;color:var(--text-3);margin-bottom:8px;">최근 해시태그 감상 기록</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              <span class="badge-pill pink">#신드롬</span>
+              <span class="badge-pill">#성유진실물</span>
+              <span class="badge-pill">#에스급비주얼원탑</span>
+              <span class="badge-pill">#제복핏</span>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-size:13px;font-weight:700;margin-bottom:5px;">인기 게시물 · 좋아요 48.2K</div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.5;">“배우 시절부터 지금까지 얼굴 폼 한 번도 안 떨어지는 거 실화냐... 어제 구 시네마 콤플렉스 9초 소각 짤 무한 재생 중”</div>
+          </div>
+        `
+      },
+      'sns-x': {
+        title: 'X (구 트위터)',
+        sub: '실시간 트렌드 감상용',
+        html: `
+          <div class="card">
+            <div style="font-size:11px;color:var(--cyan);font-weight:700;margin-bottom:4px;">대한민국 실시간 트렌드 1위</div>
+            <div style="font-size:14px;font-weight:700;margin-bottom:4px;">#신드롬_9초소각</div>
+            <div style="font-size:12px;color:var(--text-2);">게시물 62.4K · “역대 에스급 센티넬 중 비주얼 원탑은 역시 신드롬 반박 불가”</div>
+          </div>
+          <div class="card">
+            <div style="font-size:11px;color:var(--text-3);margin-bottom:4px;">실시간 트렌드 3위</div>
+            <div style="font-size:14px;font-weight:700;margin-bottom:4px;">#성유진_배우시절_리즈</div>
+            <div style="font-size:12px;color:var(--text-2);">전직 톱배우 시절 레전드 직캠 및 화보 재조명 스레드.</div>
+          </div>
+        `
+      },
+      'sns-anon': {
+        title: '아크 익명 커뮤니티',
+        sub: '사내 익명 게시판 (블라인드)',
+        html: `
+          <div class="card crimson-tint">
+            <div style="font-size:11px;color:var(--text-3);margin-bottom:4px;">익명 · 조회 1,420</div>
+            <div style="font-size:13.5px;font-weight:700;margin-bottom:8px;">루미너스 요원 요즘 더 예뻐진 듯 혹시 남친 없나?</div>
+            <div style="padding:10px;border-radius:12px;background:rgba(224,60,78,0.18);border:1px solid rgba(224,60,78,0.35);font-size:12.5px;font-weight:700;color:#ff9aa6;">
+              ↳ 유부녀다 눈깔 뽑히기 싫으면 글 내려라 -신드롬
+            </div>
+          </div>
+        `
+      },
+      'priv-bank': {
+        title: 'VIP 프라이빗 뱅킹',
+        sub: 'BLACK VVIP 전용 자산 관리',
+        html: `
+          <div class="card">
+            <div style="font-size:11px;color:var(--text-3);">BLACK VVIP 통합 계좌</div>
+            <div style="font-size:20px;font-weight:700;margin:4px 0 8px;">한도 무제한 · 정상</div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.55;">• 프랑스 주얼리 하우스 커스텀 목걸이 — 결제 완료<br>• 해안 프라이빗 요트 &amp; 불꽃놀이 — 견적 대기<br>• 수제 마카롱 / 생딸기 카페 — 정기 결제</div>
+          </div>
+        `
+      },
+      'priv-catalog': {
+        title: 'VVIP 전용 카탈로그',
+        sub: '하이엔드 명품 프라이빗 쇼룸',
+        html: `
+          <div class="card pink-tint">
+            <div class="badge-pill emerald" style="margin-bottom:6px;">프라이빗 오더 수령 완료</div>
+            <div style="font-size:14px;font-weight:700;margin-bottom:5px;">최상급 핑크 다이아몬드 커스텀 목걸이</div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.5;">4월 9일 한류아 생일 선물. 현재 드레스룸 금고 벨벳 상자에 보관 중.</div>
+          </div>
+        `
+      },
+      'priv-dining': {
+        title: '캐치테이블 블랙',
+        sub: '미쉐린 가이드 파인다이닝 예약',
+        html: `
+          <div class="card pink-tint">
+            <div style="font-size:13.5px;font-weight:700;margin-bottom:5px;">셰프 사전 요청 메모 (고정)</div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.5;">“동행인 식사량이 적고 단 음식을 선호합니다. 메인 코스는 가볍게, <strong>디저트 코스는 두 배로</strong> 준비해 주십시오.”</div>
+          </div>
+        `
+      },
+      'priv-delivery': {
+        title: '배달 앱 (한류아 야식 전용)',
+        sub: '평소 배달 음식을 경멸하나 오직 아내 심부름용',
+        html: `
+          <div style="font-size:11.5px;color:var(--pink);margin-bottom:8px;">♥ 즐겨찾기 매장 목록</div>
+          <div class="card"><div style="font-size:13.5px;font-weight:700;">🧁 수제 마카롱 부티크</div><div style="font-size:11.5px;color:var(--text-2);margin-top:3px;">단골 주문 · 생딸기 크림 &amp; 바닐라 마카롱</div></div>
+          <div class="card"><div style="font-size:13.5px;font-weight:700;">🍓 프리미엄 생딸기 디저트 카페</div><div style="font-size:11.5px;color:var(--text-2);margin-top:3px;">단골 주문 · 생딸기 타르트 &amp; 생크림 케이크</div></div>
+          <div class="card"><div style="font-size:13.5px;font-weight:700;">🌶️ 매운 아이스크림 떡볶이 본점</div><div style="font-size:11.5px;color:var(--text-2);margin-top:3px;">야식 특선 · 순한맛/중간맛 선택 기록</div></div>
+        `
+      },
+      'etc-diet': {
+        title: '체형 · 식단 성분 분석',
+        sub: 'S급 센티넬 컨디션 관리',
+        html: `
+          <div class="card">
+            <div style="font-size:13.5px;font-weight:700;margin-bottom:6px;">성유진 체형 및 식단 기록</div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.55;">• 평소 식욕: 낮음 (소식 유지)<br>• 체지방률 / 근육 밸런스: 최상위 전투 요원 기준 유지<br>• 최근 요리 메모: 새우 오일 파스타 (마늘 안 태우기), 황태해장국</div>
+          </div>
+        `
+      },
+      'etc-sleep': {
+        title: '수면 사이클 측정기',
+        sub: '아침 07:00 기상 패턴 연동',
+        html: `
+          <div class="card">
+            <div style="font-size:13.5px;font-weight:700;margin-bottom:6px;">어젯밤 수면 리포트</div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.55;">• 기상 시각: 07:00 (진동 알람 · 품에서 잠든 한류아 깨우지 않고 기상)<br>• 특이사항: 새벽 수족냉증 케어 기록 있음</div>
+          </div>
+        `
+      }
+    };
+
+    const v = views[appId] || { title: 'ARCH-OS', sub: '시스템 앱', html: '<div class="card">준비된 화면입니다.</div>' };
+    titleEl.textContent = v.title;
+    subEl.textContent = v.sub;
+    body.innerHTML = v.html;
+  }
+
+  /* ================= REAL-TIME CLOCK & LIVE VITAL ================= */
+  function updateClocks() {
+    try {
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const tStr = `${hh}:${mm}`;
+      if ($('statusTime')) $('statusTime').textContent = tStr;
+      if ($('lockClock')) $('lockClock').textContent = tStr;
+      if ($('homeClock')) $('homeClock').textContent = tStr;
+    } catch (e) { /* non-blocking */ }
+  }
+  updateClocks();
+  setInterval(updateClocks, 15000);
+
+  setInterval(() => {
+    try {
+      const bpmEl = $('vitalBpm');
+      if (bpmEl) {
+        const bpm = 70 + Math.floor(Math.random() * 5);
+        bpmEl.textContent = `${bpm} BPM`;
+      }
+    } catch (e) { /* non-blocking */ }
+  }, 3200);
+
+  /* ================= GLOBAL EVENT LISTENERS (DELEGATED) ================= */
+  // Hardware & System Navigation
+  $('hwPowerBtn').addEventListener('click', () => {
+    if (state.screenStack[state.screenStack.length - 1] === 'lock') {
+      $('irisUnlockBtn').click();
+    } else {
+      lockDevice();
+    }
+  });
+  $('navBackBtn').addEventListener('click', goBack);
+  $('navHomeBtn').addEventListener('click', goHome);
+  $('navLockBtn').addEventListener('click', lockDevice);
+
+  // Iris Unlock
+  $('irisUnlockBtn').addEventListener('click', () => {
+    const txt = $('irisUnlockText');
+    if (txt) txt.textContent = '홍채 인식 완료 (0.1초) — 환영합니다, 신드롬';
+    setTimeout(() => {
+      state.screenStack = ['home'];
+      syncActiveScreen();
+      if (txt) txt.textContent = '생체 홍채 인식으로 잠금 해제 (0.1초)';
+    }, 150);
+  });
+
+  // Folder Modal Close
+  $('folderCloseBtn').addEventListener('click', closeFolderModal);
+  $('folderBackdrop').addEventListener('click', (e) => {
+    if (e.target === $('folderBackdrop')) closeFolderModal();
+  });
+
+  // Auth Modal
+  $('authCancelBtn').addEventListener('click', closeAuthModal);
+  $('authBackdrop').addEventListener('click', (e) => {
+    if (e.target === $('authBackdrop')) closeAuthModal();
+  });
+  $('authConfirmBtn').addEventListener('click', () => {
+    const target = state.pendingAuthTarget;
+    closeAuthModal();
+    if (target === 'secret-album') {
+      state.secretUnlocked = true;
+      showToast('홍채 재인증 완료 · [Secret] 앨범이 열렸습니다.');
+      openScreen('gallery-detail', 'secret');
+    } else if (target === 'ledger-note') {
+      state.ledgerUnlocked = true;
+      showToast('암호 해제 완료 · [장부] 메모를 열람합니다.');
+      openScreen('note-detail', 'n2');
+    }
+  });
+
+  // Call Hangup
+  $('callHangupBtn').addEventListener('click', () => {
+    closeCallOverlay();
+    showToast('통화를 종료했습니다.');
+  });
+
+  // Camera controls
+  const camLenses = ['50mm', '85mm', '35mm'];
+  $('camShutterBtn').addEventListener('click', () => {
+    showToast('📸 화보급 고화질 사진이 [한류아] 앨범에 저장되었습니다.');
+  });
+  $('camLensBtn').addEventListener('click', () => {
+    state.camLensIdx = (state.camLensIdx + 1) % camLenses.length;
+    const lens = camLenses[state.camLensIdx];
+    $('camLensBtn').textContent = lens;
+    $('camModeLabel').textContent = `인물 사진 · ${lens} f/1.4 · RAW`;
+  });
+
+  // Swipe support for Home Page 1 <-> Page 2
+  let touchStartX = 0;
+  const vp = $('homePagesViewport');
+  vp.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].clientX;
+  }, { passive: true });
+  vp.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (dx < -45 && state.homePage === 1) switchHomePage(2);
+    else if (dx > 45 && state.homePage === 2) switchHomePage(1);
+  }, { passive: true });
+
+  // Unified Event Delegation inside phoneScreen
+  $('phoneScreen').addEventListener('click', (e) => {
+    // 1. Back button inside any app header
+    const backBtn = e.target.closest('[data-action="back"]');
+    if (backBtn) { goBack(); return; }
+
+    // 2. Home page switcher
+    const pageBtn = e.target.closest('[data-switch-page]');
+    if (pageBtn) { switchHomePage(Number(pageBtn.dataset.switchPage)); return; }
+
+    // 3. Open direct app from Home/Dock/Camera
+    const openAppBtn = e.target.closest('[data-open-app]');
+    if (openAppBtn) { launchAppById(openAppBtn.dataset.openApp); return; }
+
+    // 4. Open Folder
+    const folderBtn = e.target.closest('[data-folder]');
+    if (folderBtn) { openFolder(folderBtn.dataset.folder); return; }
+
+    // 5. Launch App inside Folder Modal
+    const launchBtn = e.target.closest('[data-launch-app]');
+    if (launchBtn) { launchAppById(launchBtn.dataset.launchApp); return; }
+
+    // 6. Phone tabs & calls
+    const phoneTab = e.target.closest('[data-phone-tab]');
+    if (phoneTab) { state.phoneTab = phoneTab.dataset.phoneTab; renderPhone(); return; }
+
+    const callItem = e.target.closest('[data-call-id]');
+    if (callItem) {
+      const c = CALL_LOGS.find((x) => x.id === callItem.dataset.callId);
+      if (c) {
+        showToast(`${c.name} — ${c.note}`);
+        openCallOverlay(c.name, c.avatar);
+      }
+      return;
+    }
+
+    const dialBtn = e.target.closest('[data-dial-name]');
+    if (dialBtn) {
+      openCallOverlay(dialBtn.dataset.dialName, dialBtn.dataset.dialAvatar);
+      return;
+    }
+
+    // 7. Messenger chat room open & voice playback
+    const chatBtn = e.target.closest('[data-chat-id]');
+    if (chatBtn) { openScreen('chatroom', chatBtn.dataset.chatId); return; }
+
+    const voiceBtn = e.target.closest('[data-voice-idx]');
+    if (voiceBtn) {
+      voiceBtn.classList.toggle('playing');
+      showToast(voiceBtn.classList.contains('playing')
+        ? '🔊 음성 재생 중: “손끝 안 대는 대신 자정 넘어가면 울면서 빌어도 안 봐준다, 한류아.”'
+        : '음성 재생 일시정지');
+      return;
+    }
+
+    // 8. Gallery tabs, albums, photo detail
+    const galTab = e.target.closest('[data-gal-tab]');
+    if (galTab) { state.galleryTab = galTab.dataset.galTab; renderGallery(); return; }
+
+    const albumBtn = e.target.closest('[data-album-key]');
+    if (albumBtn) {
+      const key = albumBtn.dataset.albumKey;
+      if (key === 'secret' && !state.secretUnlocked) {
+        openAuthModal('secret-album', '[Secret] 생체 암호 잠금', '홍채 인식을 한 번 더 거쳐야만 열리는 비공개 아카이브입니다.');
+      } else {
+        openScreen('gallery-detail', key);
+      }
+      return;
+    }
+
+    const favDoc = e.target.closest('[data-fav-doc]');
+    if (favDoc) {
+      showToast('📜 지난해 12월 9일, 아크 라운지에서 서명 직후 촬영된 혼인신고서 원본입니다.');
+      return;
+    }
+
+    const photoBtn = e.target.closest('[data-photo-id]');
+    if (photoBtn) {
+      const al = GALLERY_ALBUMS[photoBtn.dataset.photoAlbum];
+      const item = al && al.items.find((x) => x.id === photoBtn.dataset.photoId);
+      if (item && $('photoPreviewBox')) {
+        $('photoPreviewBox').innerHTML = `
+          <div class="card pink-tint">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+              <strong style="font-size:13.5px;">${escapeHtml(item.title)}</strong>
+              <span style="font-size:11px;color:var(--text-3);">${escapeHtml(item.date)}</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.55;">${escapeHtml(item.desc).replace(/\n/g, '<br>')}</div>
+          </div>
+        `;
+        $('photoPreviewBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      return;
+    }
+
+    // 9. Browser tabs & search item click
+    const brTab = e.target.closest('[data-br-tab]');
+    if (brTab) { state.browserTab = brTab.dataset.brTab; renderBrowser(); return; }
+
+    const searchQ = e.target.closest('[data-search-q]');
+    if (searchQ) {
+      showToast(`🌐 검색 기록 확인: "${searchQ.dataset.searchQ}"`);
+      return;
+    }
+
+    // 10. Notes open
+    const noteBtn = e.target.closest('[data-note-id]');
+    if (noteBtn) {
+      const id = noteBtn.dataset.noteId;
+      if (id === 'n2' && !state.ledgerUnlocked) {
+        openAuthModal('ledger-note', '[장부] 암호 잠금', '날짜와 횟수가 기록된 정산표입니다. 홍채 인증으로 잠금을 해제하시겠습니까?');
+      } else {
+        openScreen('note-detail', id);
+      }
+      return;
+    }
+
+    // 11. Calendar month & day
+    const calMonthBtn = e.target.closest('[data-cal-month]');
+    if (calMonthBtn) {
+      state.calMonth = Number(calMonthBtn.dataset.calMonth);
+      state.calSelectedDay = state.calMonth === 3 ? 13 : 9;
+      renderCalendar();
+      return;
+    }
+    const calDayBtn = e.target.closest('[data-cal-day]');
+    if (calDayBtn) {
+      state.calSelectedDay = Number(calDayBtn.dataset.calDay);
+      renderCalendar();
+      return;
+    }
+
+    // 12. Clock alarm toggle & alarm voice preview
+    const alarmToggle = e.target.closest('[data-alarm-toggle]');
+    if (alarmToggle) {
+      const al = state.alarms.find((a) => a.id === alarmToggle.dataset.alarmToggle);
+      if (al) {
+        al.on = !al.on;
+        renderClock();
+        showToast(`[${al.time} ${al.label}] 알람이 ${al.on ? '켜졌습니다' : '꺼졌습니다'}.`);
+      }
+      return;
+    }
+    if (e.target.closest('#playAlarmVoiceBtn')) {
+      showToast('🔊 “야 성유진! 빨리 안 일어나?!” (한류아 녹음 알람음 재생)');
+      return;
+    }
+
+    // 13. Audio player controls & track list
+    const audioCtrl = e.target.closest('[data-audio-ctrl]');
+    if (audioCtrl) {
+      const act = audioCtrl.dataset.audioCtrl;
+      if (act === 'toggle') {
+        state.isAudioPlaying = !state.isAudioPlaying;
+        startAudioLoop();
+      } else if (act === 'prev') {
+        state.activeAudioIdx = (state.activeAudioIdx - 1 + TRACKS.length) % TRACKS.length;
+        state.audioProgress = 12;
+        state.isAudioPlaying = true;
+        startAudioLoop();
+      } else if (act === 'next') {
+        state.activeAudioIdx = (state.activeAudioIdx + 1) % TRACKS.length;
+        state.audioProgress = 12;
+        state.isAudioPlaying = true;
+        startAudioLoop();
+      }
+      renderAudio();
+      return;
+    }
+    const trackBtn = e.target.closest('[data-track-idx]');
+    if (trackBtn) {
+      state.activeAudioIdx = Number(trackBtn.dataset.trackIdx);
+      state.audioProgress = 10;
+      state.isAudioPlaying = true;
+      startAudioLoop();
+      renderAudio();
+      return;
+    }
+
+    // 14. Shopping filters & cart item toggle
+    const shopFilter = e.target.closest('[data-shop-filter]');
+    if (shopFilter) { state.shoppingFilter = shopFilter.dataset.shopFilter; renderShopping(); return; }
+
+    const cartToggle = e.target.closest('[data-cart-toggle]');
+    if (cartToggle) {
+      const id = cartToggle.dataset.cartToggle;
+      state.checkedCartIds[id] = !state.checkedCartIds[id];
+      renderShopping();
+      return;
+    }
+  });
+});
+</script>
+</body>
+</html>
